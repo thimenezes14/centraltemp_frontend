@@ -1,0 +1,26 @@
+.paginaAlerta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+@media screen and (max-width: 576px) {
+    .paginaAlerta {
+        margin-top: -20px;
+    }
+}
+
+.avisoLigado .Heading h1 {
+    font-size: 10px !important;
+}
+
+.avisoLigado {
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    max-width: 600px;
+}
