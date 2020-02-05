@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import './home.css';
-import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
-import { FaCog, FaHandPointUp } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { Row, Button, Card, Col, Container, Alert } from 'react-bootstrap';
-import api from '../../services/api';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
+import { Row, Button, Col } from 'react-bootstrap';
+import { CardInfo, AlertMessage, Logotipo, Pagina, Icone } from './style';
+import { FaCog, FaHandPointUp } from 'react-icons/fa';
+
+import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
 
 class Home extends Component {
 
@@ -14,60 +13,66 @@ class Home extends Component {
         super(props);
 
         this.state = {
-            loading: true
+            loading: true,
+            chuveiroStatus: null
         }
     }
 
     async componentDidMount() {
-        try {
-            const response = await api.get('chuveiro');
-            if (response.data.ligado) {
+        await this.props.showerStatus()
+            .then(status => {
+                this.setState({ erro: false });
+                this.setState({ loading: false });
+                this.setState({ chuveiroStatus: status.ligado });
+            });
+
+        if (this.state.chuveiroStatus === null) {
+            console.log("Ocorreu um erro ao carregar o estado do chuveiro. ");
+        } else {
+            if (this.state.chuveiroStatus) {
                 this.props.history.push('/banho');
-            } else {
-                this.setState({loading: false});
             }
-        } catch (err) {
-            console.log(err);
         }
+
     }
 
     render() {
         return (
             <div>
-                <Container>
-                    <div className="teste">
-                        <img src={Logo} alt="logotipo CentralTemp" />
-                    </div>
+                <Pagina>
+                
+                    <Logotipo src={Logo} /> 
+                 
                     {this.state.loading
-                        ? (<Alert variant="primary">Carregando...</Alert>) :
+                        ? (<AlertMessage variant="primary"><AlertMessage.Heading>Carregando...</AlertMessage.Heading></AlertMessage>) :
                         (
                             <Row>
                                 <Col xs={12} md={6}>
-                                    <Card className="cardModo">
-                                        <FaHandPointUp size={128} className="cardIcone" />
-                                        <Card.Body>
-                                            <Card.Title className="cardTitulo">Modo Manual</Card.Title>
-                                            <Card.Text className="cardTexto">
+                                    <CardInfo>
+                                        <Icone><FaHandPointUp size={128} /></Icone>
+                                        <CardInfo.Body>
+                                            <CardInfo.Title className="text-dark text-center">Modo Manual</CardInfo.Title>
+                                            <CardInfo.Text className="text-dark text-center">
                                                 Escolha este modo se deseja apenas ligar o chuveiro de forma rápida e fácil, sem se preocupar. Não requer nenhum perfil para funcionar.
-                                            </Card.Text>
+                                            </CardInfo.Text>
                                             <Link to="/banho"><Button className="cardBotao" block>SELECIONAR</Button></Link>
-                                        </Card.Body>
-                                    </Card>
+                                        </CardInfo.Body>
+                                    </CardInfo>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <Card className="cardModo">
-                                        <FaCog size={128} className="cardIcone" />
-                                        <Card.Body>
-                                            <Card.Title className="cardTitulo">Modo Automático</Card.Title>
-                                            <Card.Text className="cardTexto">
+                                    <CardInfo>
+                                        <Icone><FaCog size={128}/></Icone>
+                                        <CardInfo.Body>
+                                            <CardInfo.Title className="text-dark text-center">Modo Automático</CardInfo.Title>
+                                            <CardInfo.Text className="text-dark text-center">
                                                 Escolha este modo se deseja banhos personalizados de acordo com suas preferências. Um perfil será necessário para isso.
-                                        </Card.Text>
+                                            </CardInfo.Text>
                                             <Link to="/perfis"><Button className="cardBotao" block>SELECIONAR</Button></Link>
-                                        </Card.Body>
-                                    </Card>
+                                        </CardInfo.Body>
+                                    </CardInfo>
                                 </Col>
                             </Row>)}
-                </Container>
+                </Pagina>
 
             </div>
         )

@@ -1,65 +1,90 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Button, Container, Card, Alert } from 'react-bootstrap';
+
+import { Button } from 'react-bootstrap';
+import { CardInfo, AlertMessage } from './style';
 import { FaShower, FaArrowLeft } from 'react-icons/fa';
 import Banheira from '../../components/lotties/animacaoBanheira';
-import api from '../../services/api';
 
-import './chuveiro.css';
+import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
+import { Pagina, Logotipo } from './style';
+
+//import ReactTooltip from 'react-tooltip';
 
 class Chuveiro extends Component {
+
   constructor(props) {
     super(props);
 
     this.state = {
       loading: true,
-      chuveiroStatus: null,
+      chuveiro: {
+        status: null,
+        temperatura: null
+      },
+
       erro: false
     }
+
   }
 
   async componentDidMount() {
 
-    try {
-      const response = await api.get('chuveiro');
-      this.setState({ chuveiroStatus: response.data.ligado });
-    } catch (err) {
-      console.log(err);
-      this.setState({erro: true})
-    } finally {
-      this.setState({loading: false});
-    }
+    await this.props.showerStatus()
+      .then(estado => {
+        this.setState({ erro: false });
+        this.setState({ chuveiro: { status: estado.ligado, temperatura: estado.temperatura } });
+      });
+
+    if (this.state.chuveiroStatus === null) {
+      this.setState({ erro: true });
+    } 
+
+    this.setState({ loading: false });
+
+
+    /* 
+        <ReactTooltip />
+        <p data-tip="hello world" data-place="bottom">Tooltip</p>
+    */
 
   }
 
   render() {
     return (
       <div>
-        <Container className="paginaAlerta">
+        <Pagina>
+          
+          <Logotipo src={Logo} />
+          
           {this.state.loading
             ? (
-              <Alert variant="primary">
+              <AlertMessage variant="primary">
                 Verificando status do chuveiro, aguarde...
-              </Alert>
-            ) : this.state.erro 
-            ? (<Alert variant="danger" className="text-center"><Alert.Heading>Erro ao carregar estado do chuveiro</Alert.Heading><Link to="/"><Button variant="danger">Voltar para o Início</Button></Link></Alert>) 
-            : (<Card>
-              <Card.Body>
+              </AlertMessage>
+            ) : this.state.erro
+              ? (<AlertMessage variant="danger" className="text-center"><AlertMessage.Heading>Erro ao carregar estado do chuveiro</AlertMessage.Heading><Link to="/"><Button variant="danger">Voltar para o Início</Button></Link></AlertMessage>)
+              : (<CardInfo>
+                <CardInfo.Body>
 
-                <Banheira />
+                  <Banheira />
 
-                <Card.Title className="cardTitulo"><FaShower /> Chuveiro {this.state.chuveiroStatus ? 'Ligado' : 'Desligado'}</Card.Title>
+                  <CardInfo.Title className="text-dark text-center"><FaShower /> Chuveiro {this.state.chuveiro.status ? 'Ligado' : 'Desligado'}</CardInfo.Title>
 
-                <Card.Text className="text-dark text-center">
-                  Ao desligar o chuveiro, clique em "VOLTAR" para ser redirecionado ao início.
-            </Card.Text>
-                <Link to={this.state.chuveiroStatus ? '/banho' : '/'}><Button className="cardBotao" block><FaArrowLeft /> VOLTAR </Button></Link>
-              </Card.Body>
-            </Card>)}
+                  {this.state.chuveiro.status ? (
+                    <CardInfo.Text className="text-dark text-center">
+                      Temperatura: <strong>{this.state.chuveiro.temperatura} °C</strong>
+                    </CardInfo.Text>
+                  ) : ''}
 
 
-          
-        </Container>
+                  <CardInfo.Text className="text-dark text-center">
+                    Com o chuveiro desligado, clique em "VOLTAR" para ser redirecionado ao início.
+                  </CardInfo.Text>
+                  <Link to="/"><Button block><FaArrowLeft /> VOLTAR </Button></Link>
+                </CardInfo.Body>
+              </CardInfo>)}
+        </Pagina>
       </div>
     )
   }

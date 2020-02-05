@@ -1,10 +1,8 @@
 import React from 'react';
-import {withStore} from 'react-context-hook';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Routes from './routes';
 
-const estadoChuveiro = {chuveiro: {ligado: true}};
 
 function App() {
   return (
@@ -12,4 +10,4 @@ function App() {
   )
 }
 
-export default withStore(App, estadoChuveiro);
+export default App;
