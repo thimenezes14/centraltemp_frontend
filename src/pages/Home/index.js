@@ -14,25 +14,42 @@ class Home extends Component {
 
         this.state = {
             loading: true,
-            chuveiroStatus: null
+            erro: {
+                status: null,
+                mensagem: null
+            },
+            chuveiroEstado: null
         }
     }
 
     async componentDidMount() {
         await this.props.showerStatus()
-            .then(status => {
-                this.setState({ erro: false });
-                this.setState({ loading: false });
-                this.setState({ chuveiroStatus: status.ligado });
-            });
+            .then(res => {
+                this.setState({ erro: {status: false, mensagem: ''} });
+                this.setState({ chuveiroEstado: res.data.ligado });
+                if(this.state.chuveiroEstado) {
+                    this.props.history.push('/banho');
+                }
+            })
+            .catch(error => {
+                let msg = '';
+               
+                if (error.response) {
+                    msg = `Status HTTP recebido: ${error.response.status}`;
+                  } else if (error.request) {
+                    msg = `O servidor do chuveiro não respondeu.`;
+                    console.log(error.request);
+                  } else {
+                    msg = `Ocorreu um problema durante a requisição dos dados.`;
+                    console.log('Error', error.message);
+                  }
 
-        if (this.state.chuveiroStatus === null) {
-            console.log("Ocorreu um erro ao carregar o estado do chuveiro. ");
-        } else {
-            if (this.state.chuveiroStatus) {
-                this.props.history.push('/banho');
-            }
-        }
+                  this.setState({erro: {status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro. ${msg}`}});
+                
+            })
+            .finally(() => {
+                this.setState({ loading: false });
+            })
 
     }
 
@@ -42,6 +59,8 @@ class Home extends Component {
                 <Pagina>
                 
                     <Logotipo src={Logo} /> 
+
+                    {this.state.erro.status ? (<AlertMessage variant="danger">{this.state.erro.mensagem}</AlertMessage>) : ''}
                  
                     {this.state.loading
                         ? (<AlertMessage variant="primary"><AlertMessage.Heading>Carregando...</AlertMessage.Heading></AlertMessage>) :
@@ -71,7 +90,8 @@ class Home extends Component {
                                         </CardInfo.Body>
                                     </CardInfo>
                                 </Col>
-                            </Row>)}
+                            </Row>)
+                    }
                 </Pagina>
 
             </div>

@@ -12,6 +12,7 @@
     "react": "^16.12.0",
     "react-animations": "^1.0.0",
     "react-bootstrap": "^1.0.0-beta.16",
+    "react-bootstrap-range-slider": "^0.2.0",
     "react-context-hook": "^1.2.0",
     "react-dom": "^16.12.0",
     "react-icons": "^3.9.0",
