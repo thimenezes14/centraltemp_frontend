@@ -34,12 +34,19 @@ export const CardInfo = styled(Card)`
         display: block;
         background: #004f9a;
         outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 20px auto;
     }
 
     animation: 1s ${keyframes `${headShake}`};
 `;
 
 export const AlertMessage = styled(Alert)`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     h1 {
         font-weight: bold;
     }

@@ -24,7 +24,8 @@ class AnimacaoBanheira extends Component {
               style={
                   {
                       padding: '0',
-                      margin: '-40px auto'
+                      margin: '-40px auto',
+                      marginTop: '-70px'
                   }
               }
         />
