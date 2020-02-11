@@ -1,6 +1,6 @@
 {
   "chuveiro": {
-    "ligado": true,
-    "temperatura": 40
+    "ligado": false,
+    "temperatura": 41
   }
 }

@@ -93,19 +93,24 @@ function Chuveiro(props) {
 
                 <Banheira />
 
-                <AlertMessage variant={chuveiroEstado.status ? 'success' : 'danger'}><CardInfo.Title className="text-dark text-center"><FaShower /> Chuveiro <strong>{chuveiroEstado.status ? 'Ligado' : 'Desligado'}</strong></CardInfo.Title></AlertMessage>
+                <CardInfo.Title className="text-dark text-center">
+                  <AlertMessage variant={chuveiroEstado.status ? 'success' : 'danger'}>
+                    <FaShower size={25} /><strong>{chuveiroEstado.status ? 'Ligado' : 'Desligado'}</strong>
+                  </AlertMessage>
+                </CardInfo.Title>
                 
 
                 {chuveiroEstado.status && 
-                  <AlertMessage variant="info">
-                    <FaThermometerHalf size={25}/><AlertMessage.Heading><strong>{chuveiroEstado.temperatura} °C</strong></AlertMessage.Heading>
-                  </AlertMessage>
+                  <CardInfo.Title className="text-dark text-center">
+                    <AlertMessage variant="info">
+                      <FaThermometerHalf size={25}/><strong>{chuveiroEstado.temperatura} °C</strong>
+                    </AlertMessage>
+                  </CardInfo.Title>
                 }
 
                 <Button block onClick={handleBack}><FaArrowLeft /> VOLTAR </Button>
                 {!chuveiroEstado.status && (
                     <div>
-                      <AlertMessage variant="info">Com o chuveiro desligado, clique em "VOLTAR" para ser redirecionado ao início.</AlertMessage>
                       <Button block variant="success" onClick={() => handleLigarChuveiro(tempRange)}><FaToggleOn /> LIGAR CHUVEIRO</Button>
 
                       <Button onClick={() => setCollapseOpen(!collapseOpen)}

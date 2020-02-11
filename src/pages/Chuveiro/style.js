@@ -7,10 +7,11 @@ export const Pagina = styled(Container)`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-
+    
     @media (min-width: 768px) {
         height: 100vh;
     }
+    
 `;
 
 export const CardInfo = styled(Card)`
@@ -54,10 +55,10 @@ export const AlertMessage = styled(Alert)`
 
 export const Logotipo = styled.img`
     width: 300px;
-    margin: 10px 10px;
+    margin: 30px 10px;
 
     @media (min-width: 768px) {
-        width: 400px !important;
-        margin: 0 10px 50px !important;
+        width: 350px !important;
+        margin: 10px 10px 50px !important;
     }
 `;

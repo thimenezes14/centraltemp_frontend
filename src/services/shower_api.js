@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+
+const MEU_IP = process.env.REACT_APP_IP;
+const MINHA_PORTA = '3333';
+
 const api = axios.create({
-    baseURL: 'http://10.119.99.108:3333'
+    baseURL: `http://${MEU_IP}:${MINHA_PORTA}`
 })
 
 export default api;
