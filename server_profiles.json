@@ -1,0 +1,11 @@
+{
+
+  "perfis": [
+    {"id": "1", "nome": "Thiago", "avatar": "https://ipc.digital/wp-content/uploads/2016/07/icon-user-default.png"},
+    {"id": "2", "nome": "Bruna", "avatar": "https://ipc.digital/wp-content/uploads/2016/07/icon-user-default.png"},
+    {"id": "3", "nome": "Agatha", "avatar": "https://ipc.digital/wp-content/uploads/2016/07/icon-user-default.png"},
+    {"id": "4", "nome": "Rosivaldo", "avatar": "https://ipc.digital/wp-content/uploads/2016/07/icon-user-default.png"},
+    {"id": "5", "nome": "Edite", "avatar": "https://ipc.digital/wp-content/uploads/2016/07/icon-user-default.png"}
+  ]
+
+}

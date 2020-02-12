@@ -27,9 +27,6 @@ class Home extends Component {
             .then(res => {
                 this.setState({ erro: {status: false, mensagem: ''} });
                 this.setState({ chuveiroEstado: res.data.ligado });
-                if(this.state.chuveiroEstado) {
-                    //this.props.history.push('/banho');
-                }
             })
             .catch(error => {
                 let msg = '';
