@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components';
-import { Card, Alert, Container, Carousel } from 'react-bootstrap';
+import { Card, Alert, Container } from 'react-bootstrap';
 import { headShake } from 'react-animations';
 
 export const Pagina = styled(Container)`

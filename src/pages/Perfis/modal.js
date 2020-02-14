@@ -1,24 +1,38 @@
 import React, { useState } from 'react';
-import { ModalAuth, FormAuth, FormAuthInput, BotaoPainel, Botao } from './style';
+import { ModalAuth, FormAuth, FormAuthInput, Botao, IconeBotaoLoading } from './style';
 import {FaKey} from 'react-icons/fa';
 
 export default function Modal(props) {
     const [senha, setSenha] = useState('');
     const [botaoLoading, setBotaoLoading] = useState(false);
+    const [botaoDisabled, setBotaoDisabled] = useState(true);
 
     const handleSenha = e => {
-        if(RegExp(/^[0-9]*$/).test(e.target.value) && e.target.value.length <= 4)
+        const TAMANHO_SENHA = 4;
+        if(RegExp(/^[0-9]*$/).test(e.target.value) && e.target.value.length <= TAMANHO_SENHA) {
             setSenha(e.target.value);
+        } else {
+            return false;
+        }
+
+        if(e.target.value.length === TAMANHO_SENHA) {
+            setBotaoDisabled(false);
+        } else {
+            setBotaoDisabled(true);
+        }
     }
 
     const handleAuth = e => {
-
-        console.log(e);
-        setBotaoLoading(true)
-        console.log("Senha digitada: " + senha);
+        setBotaoLoading(true);
         setSenha('');
+        setBotaoDisabled(true);
 
-        setTimeout(() => {console.log("Autentiquei!"); props.onHide(); setBotaoLoading(false)}, 5000);
+        setTimeout(() => {
+            console.log("Autentiquei!"); 
+            props.onHide(); 
+            setBotaoLoading(false);
+        }, 5000);
+
         e.preventDefault();
     }
 
@@ -34,15 +48,15 @@ export default function Modal(props) {
             >
                 <ModalAuth.Header closeButton>
                     <ModalAuth.Title id="contained-modal-title-vcenter">
-                        Olá, {props.perfilauth.nome}!
+                        AUTENTICAÇÃO
                     </ModalAuth.Title>
                 </ModalAuth.Header>
                 <FormAuth onSubmit={e => handleAuth(e)}>
                     <ModalAuth.Body>
-                        <FormAuthInput value={senha} type="password" placeholder="Digite a sua senha de 4 dígitos" onChange={e => handleSenha(e)} />
+                        <FormAuthInput value={senha} type="password" placeholder={`${props.perfilauth.nome}, digite a sua senha`} onChange={e => handleSenha(e)} />
                     </ModalAuth.Body>
                     <ModalAuth.Footer>
-                        <Botao variant="success" type="submit"><FaKey /> {botaoLoading ? 'VERIFICANDO' : 'ACESSAR'}</Botao>
+                        <Botao disabled={botaoDisabled} variant="success" type="submit" loading={botaoLoading.toString()}>{botaoLoading ? (<><IconeBotaoLoading /> AUTENTICANDO...</>) : (<><FaKey /> ACESSAR</>)}</Botao>
                     </ModalAuth.Footer>
                 </FormAuth>
             </ModalAuth>

@@ -1,9 +1,17 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
+import {withRouter} from 'react-router-dom';
+import {Pagina, Logotipo} from '../../assets/global/style';
 
-export default function Cadastro() {
+import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
+import FormCadastro from './formCadastro';
+
+function Cadastro(props) {
     return (
-        <h1>
-            PÁGINA DE CADASTRO
-        </h1>
+        <Pagina>
+            <Logotipo src={Logo}/>
+            <FormCadastro />
+        </Pagina>
     )
 }
+
+export default withRouter(Cadastro);

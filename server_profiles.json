@@ -2,7 +2,7 @@
 
   "perfis": [
     {"id": "1", "nome": "Thiago", "avatar": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png"},
-    {"id": "2", "nome": "Bruna", "avatar": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png"},
+    {"id": "2", "nome": "Oriosvaldo", "avatar": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png"},
     {"id": "3", "nome": "Agatha", "avatar": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png"},
     {"id": "4", "nome": "Rosivaldo", "avatar": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png"},
     {"id": "5", "nome": "Edite", "avatar": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png"}
