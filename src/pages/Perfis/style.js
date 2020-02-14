@@ -1,6 +1,7 @@
 import styled, {keyframes} from 'styled-components';
-import {Carousel, Card} from 'react-bootstrap';
+import {Carousel, Card, Button, ButtonGroup, Modal} from 'react-bootstrap';
 import {headShake} from 'react-animations';
+import { Form } from 'react-bootstrap';
 
 export const Carrossel = styled(Carousel)`
     width: 100%;
@@ -17,11 +18,7 @@ export const Carrossel = styled(Carousel)`
 `;
 
 export const CarrosselItem = styled(Carousel.Item)`
-    img {
-        width: 80%;
-        margin: 0 auto;
-        border-radius: 50%;
-    }
+    padding: 10px;
 `;
 
 export const CardCarousel = styled(Card)`
@@ -39,6 +36,16 @@ export const CardCarousel = styled(Card)`
     cursor: pointer;
     transition: 0.5s;
 
+    img {
+        width: 60%;
+        margin: 0 auto;
+        border-radius: 50%;
+
+        @media (min-width: 768px) {
+            width: 80% !important;
+        }
+    }
+
     &:hover {
         background: #3c9dc7;
         color: #004f9a;
@@ -47,3 +54,84 @@ export const CardCarousel = styled(Card)`
 
     animation: 1s ${keyframes `${headShake}`};
 `
+export const GrupoBotoes = styled(ButtonGroup)`
+    width: 80%;
+
+    @media (min-width: 768px) {
+        width: auto;
+    }
+`;
+
+export const BotaoPainel = styled(Button)`
+    margin-top: -10px;
+    padding: 10px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (min-width: 768px) {
+        width: 150px;
+    }
+`;
+
+export const Botao = styled(Button)`
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+`;
+
+export const ModalAuth = styled(Modal)`
+    text-align: center;
+`;
+
+export const FormAuth = styled(Form)`
+    text-align: center;
+`;
+
+export const FormAuthInput = styled(Form.Control)`
+    text-align: center;
+    font-size: 15px;
+`;
+
+export const ListaPerfis = styled.ul`
+
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+`;
+
+export const ListaPerfisItem = styled.li`
+
+    cursor: pointer;
+    
+    img {
+        width: 50px;
+        border-radius: 50%;
+        filter: grayscale(100%);
+        transition: 0.5s;
+    }
+
+    @media (min-width: 576px) {
+        img {
+            width: 60px !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        img {
+            width: 80px !important;
+        }
+    }
+
+    &:nth-child(${props => props.itemAtivo}) {
+        img {
+            filter: none;
+            transition: 0.5s;
+        }
+    }
+`;

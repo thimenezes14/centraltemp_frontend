@@ -53,7 +53,7 @@ export const AlertMessage = styled(Alert)`
 `;
 
 export const Logotipo = styled.img`
-    width: 300px;
+    width: 250px;
     margin: 30px 10px;
 
     @media (min-width: 768px) {
@@ -62,43 +62,3 @@ export const Logotipo = styled.img`
     }
 `;
 
-export const ListaPerfis = styled.ul`
-
-    list-style: none;
-
-`;
-
-export const ListaPerfisItem = styled.li`
-
-    display: inline-block;
-    cursor: pointer;
-    padding: 10px;
-    
-    img {
-        width: 40px;
-        border-radius: 50%;
-        filter: grayscale(100%);
-        transition: 0.5s;
-    }
-
-    @media (min-width: 576px) {
-        img {
-            width: 60px !important;
-        }
-    }
-
-    @media (min-width: 768px) {
-        img {
-            width: 80px !important;
-        }
-    }
-
-    &:nth-child(${props => props.itemAtivo}) {
-        img {
-            filter: none;
-            transition: 0.5s;
-        }
-    }
-
-     
-`;

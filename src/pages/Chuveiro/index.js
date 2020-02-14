@@ -66,16 +66,7 @@ function Chuveiro(props) {
   }
 
   const handleBack = () => {
-  
-    carregarDadosDoChuveiro()
-      .then(chuveiro => {
-        setChuveiroEstado({status: chuveiro.ligado, temperatura: chuveiro.temperatura});
-        if(!chuveiro.ligado) {
-          props.history.push('/');
-        }
-      })
-      .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro. ${errorHandler(error)}` }));
-  
+    props.history.push('/');
   }
 
   return (
