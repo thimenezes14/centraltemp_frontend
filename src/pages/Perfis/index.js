@@ -17,7 +17,6 @@ function Perfis(props) {
 
     async function carregarPerfis() {
         const perfis = (await profile_api.get('listar')).data;
-        console.log(perfis);
         return perfis;
     }
 

@@ -7,8 +7,6 @@ import avatar_path from '../../services/avatar_path';
 
 export default function SeletorPerfis(props) {
 
-    console.log(avatar_path);
-
     const [perfis, setPerfis] = useState([]);
     const [index, setIndex] = useState(0);
     const [direction, setDirection] = useState(null);
@@ -22,7 +20,7 @@ export default function SeletorPerfis(props) {
             perfis.push(index);
         }
         setPerfis(perfis);
-    }, []);
+    }, [props.perfis]);
 
     const handleSelect = (selectedIndex, e) => {
         setIndex(selectedIndex);
@@ -55,7 +53,7 @@ export default function SeletorPerfis(props) {
                                 <h1>{perfil.nome}</h1>
                             </CardCarousel.Title>
                             <CardCarousel.Text>
-                                <p>{perfil.data_nasc}</p>
+                                {perfil.data_nasc}
                             </CardCarousel.Text>
                         </CardCarousel>
                     </CarrosselItem>

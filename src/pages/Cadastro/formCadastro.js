@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {FormularioCadastro, BotaoFormularioCadastro} from './style';
-import {FaCheckCircle, FaUserAlt} from 'react-icons/fa';
+import { FormularioCadastro, BotaoFormularioCadastro } from './style';
+import { FaCheckCircle, FaUserAlt } from 'react-icons/fa';
 import moment from 'moment';
+import { Row, Col, Alert } from 'react-bootstrap';
 
 export default function FormCadastro() {
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
-    
+
     const [nome, setNome] = useState('');
     const [nomeOk, setNomeOk] = useState(false);
 
@@ -16,11 +17,17 @@ export default function FormCadastro() {
     const [data_nasc, setData_nasc] = useState('');
     const [data_nascOk, setData_nascOk] = useState(false);
 
-    useEffect(() => {enableButton()});
+    const [senha, setSenha] = useState('');
+    const [senhaOk, setSenhaOk] = useState(false);
+
+    const [senhaConf, setSenhaConf] = useState('');
+    const [senhaConfOk, setSenhaConfOk] = useState(false);
+
+    useEffect(() => { enableButton() });
 
     const handleNome = e => {
         const rgx = new RegExp(/^[a-zA-Zà-úÀ-Ú ]{0,10}$/);
-        if(rgx.test(e.target.value)) {
+        if (rgx.test(e.target.value)) {
             setNome(e.target.value);
         } else {
             return false;
@@ -29,19 +36,19 @@ export default function FormCadastro() {
 
     const validateNome = e => {
         const MIN_NOME = 2, MAX_NOME = 10;
-        if(e.target.value.length >= MIN_NOME && e.target.value.length <= MAX_NOME) {
+        if (e.target.value.length >= MIN_NOME && e.target.value.length <= MAX_NOME) {
             setNomeOk(true);
         } else {
             setNomeOk(false);
         }
     }
-    
+
     const handleSexo = e => {
         setSexo(e.target.value);
     }
 
     const validateSexo = e => {
-        if(sexo.length > 0) {
+        if (sexo.length > 0) {
             setSexoOk(true);
         } else {
             setSexoOk(false);
@@ -56,7 +63,7 @@ export default function FormCadastro() {
         const data_nascimento = e.target.value;
         const rgx = new RegExp(/((19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/);
 
-        if(rgx.test(data_nascimento) && moment().isSameOrAfter(Date.parse(data_nascimento))) {
+        if (rgx.test(data_nascimento) && moment().isSameOrAfter(Date.parse(data_nascimento))) {
             setData_nascOk(true);
         } else {
             setData_nascOk(false);
@@ -64,8 +71,47 @@ export default function FormCadastro() {
 
     }
 
+    const handleSenha = e => {
+        const rgx = new RegExp(/^[0-9]{0,4}$/);
+        if (rgx.test(e.target.value)) {
+            setSenha(e.target.value);
+        } else {
+            return false;
+        }
+    }
+
+    const validateSenha = e => {
+        const TAM_SENHA = 4;
+        if (e.target.value.length === TAM_SENHA) {
+            setSenhaOk(true);
+        } else {
+            setSenhaOk(false);
+        }
+    }
+
+    const handleSenhaConf = e => {
+        const rgx = new RegExp(/^[0-9]{0,4}$/);
+        if (rgx.test(e.target.value)) {
+            setSenhaConf(e.target.value);
+        } else {
+            return false;
+        }
+    }
+
+    const validateSenhaConf = e => {
+        const TAM_SENHA = 4;
+        if (e.target.value.length === TAM_SENHA) {
+            if(senhaConf === senha)
+                setSenhaConfOk(true);
+            else
+                setSenhaConfOk(false);
+        } else {
+            setSenhaConfOk(false);
+        }
+    }
+
     const enableButton = () => {
-        if(nomeOk && sexoOk && data_nascOk) {
+        if (nomeOk && sexoOk && data_nascOk && senhaOk && senhaConfOk) {
             setButtonDisabled(false);
             return true;
         } else {
@@ -81,6 +127,10 @@ export default function FormCadastro() {
         setSexoOk(false);
         setData_nasc('');
         setData_nascOk(false);
+        setSenha('');
+        setSenhaOk(false);
+        setSenhaConf('');
+        setSenhaConfOk(false);
         setButtonDisabled(true);
     }
 
@@ -90,37 +140,53 @@ export default function FormCadastro() {
         resetAll();
     }
 
- return (
-   <div>
-       <FormularioCadastro onSubmit={handleSubmit}>
-           <FormularioCadastro.Label><FaUserAlt/> CRIAR NOVO PERFIL</FormularioCadastro.Label>
-           <FormularioCadastro.Group>
-               <FormularioCadastro.Label>Nome</FormularioCadastro.Label>
-               <FormularioCadastro.Control value={nome} type="text" placeholder="Ex.: João/Maria " onChange={handleNome} onBlur={validateNome} onKeyUp={validateNome}/>
-               <FormularioCadastro.Text className="text-muted">
-                   Forneça um nome ou apelido de 2 a 10 caracteres.
-               </FormularioCadastro.Text>
-           </FormularioCadastro.Group>
-           <FormularioCadastro.Group>
-               <FormularioCadastro.Label>Sexo</FormularioCadastro.Label>
-               <FormularioCadastro.Control as="select" value={sexo} onChange={handleSexo} onBlur={validateSexo}>
-                   <option disabled value="">Selecione...</option>
-                   <option value="M">Masculino</option>
-                   <option value="F">Feminino</option>
-               </FormularioCadastro.Control>
-               <FormularioCadastro.Text className="text-muted">
-                   Forneça um sexo. Você NÃO poderá alterá-lo uma vez que o perfil tenha sido criado.
-               </FormularioCadastro.Text>
-           </FormularioCadastro.Group>
-           <FormularioCadastro.Group>
-               <FormularioCadastro.Label>Data de Nascimento</FormularioCadastro.Label>
-               <FormularioCadastro.Control type="date" value={data_nasc} onChange={handleData_nasc} onBlur={validateData_nasc}/>
-               <FormularioCadastro.Text className="text-muted">
-                   Forneça uma data de nascimento válida.
-               </FormularioCadastro.Text>
-           </FormularioCadastro.Group>
-           <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> CRIAR PERFIL</BotaoFormularioCadastro>
-       </FormularioCadastro>
-   </div>
- );
+    return (
+        <div>
+            <FormularioCadastro onSubmit={handleSubmit}>
+                <FormularioCadastro.Label><FaUserAlt /> CRIAR NOVO PERFIL</FormularioCadastro.Label>
+
+                <FormularioCadastro.Group>
+                    <FormularioCadastro.Label>Nome</FormularioCadastro.Label>
+                    <FormularioCadastro.Control value={nome} type="text" placeholder="Ex.: João/Maria " onChange={handleNome} onBlur={validateNome} onKeyUp={validateNome} />
+                    <Alert show={!nomeOk} variant="danger"><FormularioCadastro.Text className="text-muted">Forneça um nome ou apelido de 2 a 10 caracteres.</FormularioCadastro.Text></Alert>
+                </FormularioCadastro.Group>
+
+                <FormularioCadastro.Group>
+                    <Row>
+                        <Col md={6}>
+                            <FormularioCadastro.Label>Sexo</FormularioCadastro.Label>
+                            <FormularioCadastro.Control as="select" value={sexo} onChange={handleSexo} onBlur={validateSexo}>
+                                <option disabled value="">Selecione...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Feminino</option>
+                            </FormularioCadastro.Control>
+                            <Alert show={!sexoOk} variant="danger"><FormularioCadastro.Text className="text-muted">Por favor, forneça um sexo válido (masculino ou feminino). </FormularioCadastro.Text></Alert>
+                        </Col>
+                        <Col md={6}>
+                            <FormularioCadastro.Label>Data de Nascimento</FormularioCadastro.Label>
+                            <FormularioCadastro.Control type="date" value={data_nasc} onChange={handleData_nasc} onBlur={validateData_nasc} />
+                            <Alert show={!data_nascOk} variant="danger"><FormularioCadastro.Text className="text-muted">Forneça uma data de nascimento válida.</FormularioCadastro.Text></Alert>
+                        </Col>
+                    </Row>
+                </FormularioCadastro.Group>
+
+                <FormularioCadastro.Group>
+                    <Row>
+                        <Col md={6}>
+                            <FormularioCadastro.Label>Senha numérica de 4 dígitos</FormularioCadastro.Label>
+                            <FormularioCadastro.Control type="password" value={senha} onChange={handleSenha} onBlur={validateSenha} onKeyUp={e => {validateSenha(e); validateSenhaConf(e)}}/>
+                            <Alert show={!senhaOk} variant="danger"><FormularioCadastro.Text className="text-muted">Digite uma senha de 4 dígitos numéricos. </FormularioCadastro.Text></Alert>
+                        </Col>
+                        <Col md={6}>
+                            <FormularioCadastro.Label>Repita a sua senha</FormularioCadastro.Label>
+                            <FormularioCadastro.Control type="password" value={senhaConf} onChange={handleSenhaConf} onBlur={validateSenhaConf} onKeyUp={validateSenhaConf}/>
+                            <Alert show={(senhaOk && !senhaConfOk)} variant="danger"><FormularioCadastro.Text className="text-muted">Senhas não conferem. Tente novamente. </FormularioCadastro.Text></Alert>
+                        </Col>
+                    </Row>
+                </FormularioCadastro.Group>
+
+                <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> CRIAR PERFIL</BotaoFormularioCadastro>
+            </FormularioCadastro>
+        </div>
+    );
 }
