@@ -38,12 +38,12 @@ export const CardCarousel = styled(Card)`
     transition: 0.5s;
 
     img {
-        width: 60%;
+        width: 50%;
         margin: 0 auto;
         border-radius: 50%;
 
         @media (min-width: 768px) {
-            width: 80% !important;
+            width: 70% !important;
         }
     }
 
