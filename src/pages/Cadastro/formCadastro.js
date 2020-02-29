@@ -4,7 +4,11 @@ import { FaCheckCircle, FaUserAlt } from 'react-icons/fa';
 import moment from 'moment';
 import { Row, Col, Alert } from 'react-bootstrap';
 
-export default function FormCadastro() {
+import profile_api from '../../services/profile_api';
+
+export default function FormCadastro(props) {
+
+    const [error, setError] = useState({status: false, message: ''});
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
@@ -20,7 +24,7 @@ export default function FormCadastro() {
     const [senha, setSenha] = useState('');
     const [senhaOk, setSenhaOk] = useState(false);
 
-    const [senhaConf, setSenhaConf] = useState('');
+    const [senha_conf, setSenhaConf] = useState('');
     const [senhaConfOk, setSenhaConfOk] = useState(false);
 
     useEffect(() => { enableButton() });
@@ -101,7 +105,7 @@ export default function FormCadastro() {
     const validateSenhaConf = e => {
         const TAM_SENHA = 4;
         if (e.target.value.length === TAM_SENHA) {
-            if(senhaConf === senha)
+            if(senha_conf === senha)
                 setSenhaConfOk(true);
             else
                 setSenhaConfOk(false);
@@ -134,10 +138,18 @@ export default function FormCadastro() {
         setButtonDisabled(true);
     }
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
-        alert("Nome: " + nome + "\nSexo: " + sexo + "\nData Nasc.: " + data_nasc);
-        resetAll();
+      
+        try {
+            await profile_api.post('/cadastrar', {nome, sexo, data_nasc, senha, senha_conf});
+            setError({status: false, message: ''});
+            resetAll();
+            props.redirect.history.push('/perfis');
+        } catch (err) {
+            setError({status: true, message: err.response.data.err});
+        }
+        
     }
 
     return (
@@ -179,13 +191,14 @@ export default function FormCadastro() {
                         </Col>
                         <Col md={6}>
                             <FormularioCadastro.Label>Repita a sua senha</FormularioCadastro.Label>
-                            <FormularioCadastro.Control type="password" value={senhaConf} onChange={handleSenhaConf} onBlur={validateSenhaConf} onKeyUp={validateSenhaConf}/>
+                            <FormularioCadastro.Control type="password" value={senha_conf} onChange={handleSenhaConf} onBlur={validateSenhaConf} onKeyUp={validateSenhaConf}/>
                             <Alert show={(senhaOk && !senhaConfOk)} variant="danger"><FormularioCadastro.Text className="text-muted">Senhas não conferem. Tente novamente. </FormularioCadastro.Text></Alert>
                         </Col>
                     </Row>
                 </FormularioCadastro.Group>
 
                 <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> CRIAR PERFIL</BotaoFormularioCadastro>
+                <Alert variant="danger" show={error.status}>{error.message}</Alert>
             </FormularioCadastro>
         </div>
     );

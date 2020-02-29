@@ -15,7 +15,7 @@ export const FormularioCadastro = styled(Form)`
 
 export const BotaoFormularioCadastro = styled(Button)`
     width: 200px;
-    margin: auto;
+    margin: 10px auto;
     display: flex;
     align-items: center;
     justify-content: space-between;

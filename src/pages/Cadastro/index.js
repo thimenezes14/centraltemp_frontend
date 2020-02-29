@@ -8,13 +8,14 @@ import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-201
 import FormCadastro from './formCadastro';
 
 function Cadastro(props) {
+
     return (
         <Pagina>
             <Logotipo src={Logo}/>
             <GrupoBotoes>
                 <BotaoPainel variant="primary" onClick={() => props.history.push('/perfis')}><FaArrowLeft /> VOLTAR</BotaoPainel>
             </GrupoBotoes>
-            <FormCadastro />
+            <FormCadastro redirect={props}/>
         </Pagina>
     )
 }

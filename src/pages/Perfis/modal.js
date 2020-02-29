@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { ModalAuth, FormAuth, FormAuthInput, Botao, IconeBotaoLoading } from './style';
 import {FaKey} from 'react-icons/fa';
+import { login } from "../../services/auth";
+
+import profile_api from '../../services/profile_api';
+import { Alert } from 'react-bootstrap';
 
 export default function Modal(props) {
+    
+    const [error, setError] = useState({status: false, message: ''});
+
     const [senha, setSenha] = useState('');
     const [botaoLoading, setBotaoLoading] = useState(false);
     const [botaoDisabled, setBotaoDisabled] = useState(true);
@@ -22,18 +29,26 @@ export default function Modal(props) {
         }
     }
 
-    const handleAuth = e => {
+    const handleAuth = async e => {
+        e.preventDefault();
+
+        let id = props.perfilauth.id;
+        
         setBotaoLoading(true);
         setSenha('');
         setBotaoDisabled(true);
 
-        setTimeout(() => {
-            console.log("Autentiquei!"); 
+        try {
+            const auth = await profile_api.post('/autenticar', {id, senha});
+            login(auth.data.token);
             props.onHide(); 
             setBotaoLoading(false);
-        }, 5000);
+            props.history.push({pathname: '/dashboard', state: id});
+        } catch (err) {
+            setBotaoLoading(false);
+            setError({status: true, message: err.response.data.err});
+        }
 
-        e.preventDefault();
     }
 
     return (
@@ -44,7 +59,7 @@ export default function Modal(props) {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
                 className="text-align text-dark"
-                onExit={() => setSenha('')}
+                onExit={() => {setSenha(''); setError({status: false, message: ''});}}
             >
                 <ModalAuth.Header closeButton>
                     <ModalAuth.Title id="contained-modal-title-vcenter">
@@ -59,6 +74,7 @@ export default function Modal(props) {
                         <Botao disabled={botaoDisabled} variant="success" type="submit" loading={botaoLoading.toString()}>{botaoLoading ? (<><IconeBotaoLoading /> AUTENTICANDO...</>) : (<><FaKey /> ACESSAR</>)}</Botao>
                     </ModalAuth.Footer>
                 </FormAuth>
+                <Alert variant="danger" show={error.status}>{error.message}</Alert>
             </ModalAuth>
         </>
     )

@@ -10,6 +10,8 @@ import SeletorPerfis from './seletorPerfis';
 
 function Perfis(props) {
 
+    const [alertShow, setAlertShow] = useState(true);
+
     const [loading, setLoading] = useState({ status: true, mensagem: 'Carregando perfis. Aguarde...' });
     const [erro, setErro] = useState({ status: null, mensagem: null });
     const [perfis, setPerfis] = useState([]);
@@ -35,6 +37,7 @@ function Perfis(props) {
         <div>
             <Pagina>
                 <Logotipo src={Logo} />
+                {props.location.mensagem && <AlertMessage variant="info" dismissible show={alertShow} onClose={() => setAlertShow(false)}>{props.location.mensagem}</AlertMessage>}
 
                 {loading.status ?
                     (<AlertMessage variant="primary"><AlertMessage.Heading>{loading.mensagem}</AlertMessage.Heading></AlertMessage>) :

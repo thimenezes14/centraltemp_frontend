@@ -35,7 +35,7 @@ export default function SeletorPerfis(props) {
     return (
         <>
         
-            <Modal show={modalShow} onHide={()=> setModalShow(false)} perfilauth={perfilSelecionado}/>
+            <Modal show={modalShow} onHide={()=> setModalShow(false)} perfilauth={perfilSelecionado} history={props.history}/>
             <GrupoBotoes>
                 <BotaoPainel variant="primary" onClick={() => props.history.push('/')}><FaArrowLeft /> VOLTAR</BotaoPainel>
                 <BotaoPainel variant="info" onClick={() => props.history.push('/perfis/novo')}><FaEdit /> NOVO</BotaoPainel>
