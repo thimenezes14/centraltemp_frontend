@@ -3,9 +3,9 @@ import {AlertMessage } from '../../assets/global/style';
 import profile_api from '../../services/profile_api';
 import { withRouter } from 'react-router-dom';
 import { logout } from '../../services/auth';
-import { FaSignOutAlt, FaUserAlt } from 'react-icons/fa';
+import { FaSignOutAlt, FaUserAlt, FaShower, FaChartBar, FaEdit } from 'react-icons/fa';
 
-import {ContainerDashboard} from './style';
+import {ContainerDashboard, Abas} from './style';
 import FormEditarUsuario from './formEditarUsuario';
 
 import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
@@ -55,7 +55,7 @@ function Dashboard(props) {
                     <>
 
                     <Navbar expand="lg">
-                    <Navbar.Brand href="/dashboard"><img width="300" src={Logo} alt="Logotipo CentralTemp" /></Navbar.Brand>
+                    <Navbar.Brand href="/dashboard"><img width="250" src={Logo} alt="Logotipo CentralTemp" /></Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ml-auto">
@@ -66,18 +66,18 @@ function Dashboard(props) {
                     </Navbar>
                         <ContainerDashboard>
                             <h1>Dashboard</h1>
-                            <Tabs activeKey={key} onSelect={k => setKey(k)}>
-                                <Tab eventKey="banho" title="BANHO">
+                            <Abas className="bg-secondary nav nav-tabs nav-justified" activeKey={key} onSelect={k => setKey(k)}>
+                                <Tab eventKey="banho" title={<FaShower size={30} />}>
                                     BANHO
                                 </Tab>
-                                <Tab eventKey="estatisticas" title="ESTATÍSTICAS">
+                                <Tab eventKey="estatisticas" title={<FaChartBar size={30} />}>
                                     ESTATÍSTICAS
                                 </Tab>
-                                <Tab eventKey="dados" title="MEUS DADOS" >
+                                <Tab eventKey="dados" title={<FaEdit size={30} />} >
                                     MEUS DADOS
                                     <FormEditarUsuario usuario={perfil} />
                                 </Tab>
-                            </Tabs>
+                            </Abas>
                         </ContainerDashboard>
                     </>
             }

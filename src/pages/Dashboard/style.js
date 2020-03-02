@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Container} from 'react-bootstrap';
+import {Container, Form, Tabs, Tab} from 'react-bootstrap';
 
 export const ContainerDashboard = styled(Container)`
     width: 80%;
@@ -8,4 +8,43 @@ export const ContainerDashboard = styled(Container)`
     align-content: center;
     flex-direction: column;
     text-align: center;
+    justify-content: center;
+`;
+
+export const Abas = styled(Tabs)`
+    a {
+        text-decoration: none;
+        color: black;
+    }
+
+    a:active {
+        color: #0049fa;
+    }
+`;
+
+export const FormularioEdicao = styled(Form)`
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+    margin: auto;
+`;
+
+export const FormularioEdicaoGrupo = styled(Form.Group)`
+    display: flex;
+    align-content: center;
+    text-align: center;
+    justify-content: center;
+    padding: 5px;
+    margin: 5px;
+
+    button {
+        padding: 5px;
+        width: 50%;
+        margin: 5px;
+        @media (max-width: 768px) {
+            width: 100%;
+        }
+    }
 `;
