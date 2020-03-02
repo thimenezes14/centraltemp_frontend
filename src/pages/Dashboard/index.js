@@ -5,11 +5,11 @@ import { withRouter } from 'react-router-dom';
 import { logout } from '../../services/auth';
 import { FaSignOutAlt, FaUserAlt, FaShower, FaChartBar, FaEdit } from 'react-icons/fa';
 
-import {ContainerDashboard, Abas} from './style';
+import {Abas} from './style';
 import FormEditarUsuario from './formEditarUsuario';
 
 import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
-import { Button, Tabs, Tab, Navbar, Nav } from 'react-bootstrap';
+import { Button, Tab, Navbar, Nav } from 'react-bootstrap';
 
 function Dashboard(props) {
 
@@ -64,7 +64,7 @@ function Dashboard(props) {
                         </Nav>
                     </Navbar.Collapse>
                     </Navbar>
-                        <ContainerDashboard>
+                        <div className="container container-fluid text-center">
                             <h1>Dashboard</h1>
                             <Abas className="bg-secondary nav nav-tabs nav-justified" activeKey={key} onSelect={k => setKey(k)}>
                                 <Tab eventKey="banho" title={<FaShower size={30} />}>
@@ -75,10 +75,10 @@ function Dashboard(props) {
                                 </Tab>
                                 <Tab eventKey="dados" title={<FaEdit size={30} />} >
                                     MEUS DADOS
-                                    <FormEditarUsuario usuario={perfil} />
+                                    <FormEditarUsuario usuario={perfil} history={props.history} />
                                 </Tab>
                             </Abas>
-                        </ContainerDashboard>
+                        </div>
                     </>
             }
 

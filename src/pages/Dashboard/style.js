@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Container, Form, Tabs, Tab} from 'react-bootstrap';
+import {Container, Form, Tabs} from 'react-bootstrap';
 
 export const ContainerDashboard = styled(Container)`
     width: 80%;
