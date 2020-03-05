@@ -27,7 +27,7 @@ function Chuveiro(props) {
   const [tempRange, setTempRange] = useState(35);
 
   async function carregarDadosDoChuveiro() {
-      const chuveiro = (await shower_api.get('chuveiro')).data;
+      const chuveiro = (await shower_api.get('info')).data;
       return chuveiro;
   }
 

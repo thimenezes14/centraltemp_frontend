@@ -10,7 +10,7 @@ import shower_api from './services/shower_api';
 import {isAuthenticated} from './services/auth';
 
 async function checkShowerState() {
-    const response = await shower_api.get('chuveiro');
+    const response = await shower_api.get('info');
     return {data: response.data, status: response.status};
 }
 

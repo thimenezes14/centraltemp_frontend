@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { logout } from "../../services/auth";
 
 import profile_api from '../../services/profile_api';
-import { Alert, Modal, Button } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import {FaExclamationTriangle} from 'react-icons/fa';
 
 export default function ModalConfirmacao(props) {
@@ -11,7 +11,7 @@ export default function ModalConfirmacao(props) {
         try {
             await profile_api.delete(`${props.idusuario}/excluir`);
             logout();
-            props.history.location.push('/perfis');
+            props.history.push('/perfis');
         } catch (err) {
             console.log(err);
         }
