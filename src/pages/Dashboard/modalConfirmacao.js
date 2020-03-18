@@ -9,7 +9,7 @@ export default function ModalConfirmacao(props) {
 
     const handleAcao = async () => {
         try {
-            await profile_api.delete(`${props.idusuario}/excluir`);
+            await profile_api.delete(`excluir/${props.idusuario}`);
             logout();
             props.history.push('/perfis');
         } catch (err) {

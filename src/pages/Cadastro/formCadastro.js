@@ -142,12 +142,12 @@ export default function FormCadastro(props) {
         e.preventDefault();
       
         try {
-            await profile_api.post('/cadastrar', {nome, sexo, data_nasc, senha, senha_conf});
+            await profile_api.post('/cadastrar', {nome, senha, sexo, data_nasc, avatar: 'defaultuser.png'});
             setError({status: false, message: ''});
             resetAll();
             props.redirect.history.push('/perfis');
         } catch (err) {
-            setError({status: true, message: err.response.data.err});
+            setError({status: true, message: err.response.data});
         }
         
     }

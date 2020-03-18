@@ -21,7 +21,7 @@ function Dashboard(props) {
 
     useEffect(() => {
         const carregarPerfil = async () => {
-            const perfil = await profile_api.get(`${props.location.state}/detalhes`);
+            const perfil = await profile_api.get(`${props.location.state}`);
             return perfil.data;
         }
 
@@ -33,7 +33,7 @@ function Dashboard(props) {
             .catch(err => {
                 console.error(err);
                 if (err.response.status === 403)
-                    props.history.push({ pathname: '/perfis', mensagem: err.response.data.err });
+                    props.history.push({ pathname: '/perfis', mensagem: err.response.data });
 
                 setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.` });
                 setLoading({ status: false, mensagem: '' });

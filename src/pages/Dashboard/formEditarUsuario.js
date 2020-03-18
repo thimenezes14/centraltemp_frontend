@@ -88,9 +88,9 @@ export default function FormEditarUsuario(props) {
         const dadosParaAtualizar = {nome};
 
         if(novaSenha.length === TAM_SENHA)
-            dadosParaAtualizar.novaSenha = novaSenha;
+            dadosParaAtualizar.senha = novaSenha;
 
-        profile_api.put(`${perfilEdicao.id}/atualizar`, dadosParaAtualizar)
+        profile_api.put(`atualizar/${perfilEdicao.id}`, dadosParaAtualizar)
         .then(() => {
             setSenha('');
             setNovaSenha('');

@@ -46,7 +46,7 @@ export default function Modal(props) {
             props.history.push({pathname: '/dashboard', state: id});
         } catch (err) {
             setBotaoLoading(false);
-            setError({status: true, message: err.response.data.err});
+            setError({status: true, message: err.response.data});
         }
 
     }
