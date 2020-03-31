@@ -7,7 +7,7 @@ import profile_api from '../../services/profile_api';
 import { Alert } from 'react-bootstrap';
 
 export default function Modal(props) {
-    
+        
     const [error, setError] = useState({status: false, message: ''});
 
     const [senha, setSenha] = useState('');
@@ -32,7 +32,7 @@ export default function Modal(props) {
     const handleAuth = async e => {
         e.preventDefault();
 
-        let id = props.perfilauth.id;
+        let id = props.perfilauth.id_perfil;
         
         setBotaoLoading(true);
         setSenha('');

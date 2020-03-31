@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Pagina, Logotipo, AlertMessage } from '../../assets/global/style';
+import { AlertMessage, AlertMessageButton, AlertMessageButtonGroup } from '../../assets/global/style';
 
-import { Botao } from './style';
-import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
+import {FaArrowLeft, FaEdit, FaSyncAlt} from 'react-icons/fa';
+
+import { GrupoBotoes, BotaoPainel } from './style';
 import profile_api from '../../services/profile_api';
-import SeletorPerfis from './seletorPerfis';
+import SeletorPerfis from '../../components/SeletorPerfis';
 
 
 function Perfis(props) {
@@ -13,7 +14,7 @@ function Perfis(props) {
     const [alertShow, setAlertShow] = useState(true);
 
     const [loading, setLoading] = useState({ status: true, mensagem: 'Carregando perfis. Aguarde...' });
-    const [erro, setErro] = useState({ status: null, mensagem: null });
+    const [erro, setErro] = useState({ status: null, mensagem: null, descricao: null });
     const [perfis, setPerfis] = useState([]);
     
 
@@ -28,24 +29,42 @@ function Perfis(props) {
             .then(perfis => {
                 setPerfis(perfis);
             })
-            .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.` }))
-            .finally(() => setLoading({ status: false, mensagem: '' }))
+            .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.`, descricao: error.toString() }))
+            .finally(() => setLoading({ status: false, mensagem: '', descricao: '' }))
 
     }, []);
 
     return (
         <div>
-            <Pagina>
-                <Logotipo src={Logo} />
-                {props.location.mensagem && <AlertMessage variant="info" dismissible show={alertShow} onClose={() => setAlertShow(false)}>{props.location.mensagem}</AlertMessage>}
+            <GrupoBotoes>
+                <BotaoPainel variant="primary" onClick={() => props.history.push('/')}><FaArrowLeft /> VOLTAR</BotaoPainel>
+                <BotaoPainel variant="info" onClick={() => props.history.push('/perfis/novo')}><FaEdit /> NOVO</BotaoPainel>
+            </GrupoBotoes>
 
-                {loading.status ?
-                    (<AlertMessage variant="primary"><AlertMessage.Heading>{loading.mensagem}</AlertMessage.Heading></AlertMessage>) :
-                    erro.status ? (<AlertMessage variant="danger"><AlertMessage.Heading>{erro.mensagem}</AlertMessage.Heading><Botao variant="danger" onClick={()=> props.history.push('/')}>OK</Botao></AlertMessage>) :
-                    <SeletorPerfis perfis={perfis} history={props.history}/>
-                }
+            {props.location.mensagem && <AlertMessage variant="info" dismissible show={alertShow} onClose={() => setAlertShow(false)}>{props.location.mensagem}</AlertMessage>}
 
-            </Pagina>
+            {loading.status ?
+                (<AlertMessage variant="primary"><AlertMessage.Heading>{loading.mensagem}</AlertMessage.Heading></AlertMessage>) :
+                erro.status ? 
+                (<AlertMessage variant="danger">
+                    <AlertMessage.Heading>
+                        {erro.mensagem}
+                    </AlertMessage.Heading>
+                    <div className="text-muted">
+                        {erro.descricao}
+                    </div>
+                    <AlertMessageButtonGroup>
+                        <AlertMessageButton variant="danger" onClick={()=> props.history.push('/')}>
+                            <span><FaArrowLeft /> VOLTAR</span>
+                        </AlertMessageButton>
+                        <AlertMessageButton variant="dark" onClick={()=> window.location.reload() }>
+                            <span><FaSyncAlt /> REPETIR</span>
+                        </AlertMessageButton>
+                    </AlertMessageButtonGroup>
+                </AlertMessage>) :
+
+                <SeletorPerfis perfis={perfis} history={props.history}/>
+            }
         </div>
 
     )

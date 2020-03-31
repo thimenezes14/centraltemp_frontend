@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {AlertMessage } from '../../assets/global/style';
+import { AlertMessage, AlertMessageButtonGroup, AlertMessageButton } from '../../assets/global/style';
 import profile_api from '../../services/profile_api';
 import { withRouter } from 'react-router-dom';
-import { logout } from '../../services/auth';
-import { FaSignOutAlt, FaUserAlt, FaShower, FaChartBar, FaEdit } from 'react-icons/fa';
-
-import {Abas} from './style';
-import FormEditarUsuario from './formEditarUsuario';
-
-import Logo from '../../assets/images/centralTemp-logotipo-final-alternativo-2019.png';
-import { Button, Tab, Navbar, Nav } from 'react-bootstrap';
+import { FaShower, FaChartBar, FaEdit, FaArrowLeft, FaSyncAlt } from 'react-icons/fa';
+import { Abas } from './style';
+import FormDados from '../../components/FormDados';
+import Tab from 'react-bootstrap/Tab';
+import NavbarDashboard from '../../components/NavbarDashboard';
 
 function Dashboard(props) {
 
@@ -31,41 +28,43 @@ function Dashboard(props) {
                 setLoading({ status: false, mensagem: '' });
             })
             .catch(err => {
-                console.error(err);
-                if (err.response.status === 403)
-                    props.history.push({ pathname: '/perfis', mensagem: err.response.data });
-
-                setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.` });
+                setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.`, descricao: err.toString() });
                 setLoading({ status: false, mensagem: '' });
+                if (err.response.status === 403) {
+                    props.history.push({ pathname: '/perfis', mensagem: err.response.data });
+                }
             })
 
     }, [props]);
-
-    const sair = () => {
-        logout();
-        props.history.push('/perfis');
-    }
 
     return (
         <>
 
             {loading.status ?
                 (<AlertMessage variant="primary"><AlertMessage.Heading>{loading.mensagem}</AlertMessage.Heading></AlertMessage>) :
-                erro.status ? (<AlertMessage variant="danger"><AlertMessage.Heading>{erro.mensagem}</AlertMessage.Heading><Button variant="danger" onClick={() => props.history.push('/')}>OK</Button></AlertMessage>) :
+                erro.status ?
+                    (<AlertMessage variant="danger">
+                        <AlertMessage.Heading>
+                            {erro.mensagem}
+                        </AlertMessage.Heading>
+                        <div className="text-muted">
+                            {erro.descricao}
+                        </div>
+                        <AlertMessageButtonGroup>
+                            <AlertMessageButton variant="danger" onClick={() => props.history.push('/')}>
+                                <span><FaArrowLeft /> VOLTAR</span>
+                            </AlertMessageButton>
+                            <AlertMessageButton variant="dark" onClick={() => window.location.reload()}>
+                                <span><FaSyncAlt /> REPETIR</span>
+                            </AlertMessageButton>
+                        </AlertMessageButtonGroup>
+                    </AlertMessage>) :
                     <>
+                        <NavbarDashboard perfil={perfil} history={props.history} />
 
-                    <Navbar expand="lg">
-                    <Navbar.Brand href="/dashboard"><img width="250" src={Logo} alt="Logotipo CentralTemp" /></Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ml-auto">
-                            <Nav.Item><Button variant="info" onClick={() => {setKey('dados')}}><FaUserAlt /> {perfil.nome} </Button></Nav.Item>
-                            <Nav.Item><Button variant="danger" onClick={sair} ><FaSignOutAlt /> Sair</Button></Nav.Item>
-                        </Nav>
-                    </Navbar.Collapse>
-                    </Navbar>
+
                         <div className="container container-fluid text-center">
-                            <h1>Dashboard</h1>
+
                             <Abas className="bg-secondary nav nav-tabs nav-justified" activeKey={key} onSelect={k => setKey(k)}>
                                 <Tab eventKey="banho" title={<FaShower size={30} />}>
                                     BANHO
@@ -75,7 +74,7 @@ function Dashboard(props) {
                                 </Tab>
                                 <Tab eventKey="dados" title={<FaEdit size={30} />} >
                                     MEUS DADOS
-                                    <FormEditarUsuario usuario={perfil} history={props.history} />
+                                    <FormDados action="update" perfil={perfil} />
                                 </Tab>
                             </Abas>
                         </div>

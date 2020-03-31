@@ -5,7 +5,7 @@ import animationData from './banheira.json';
 class AnimacaoBanheira extends Component {
 
 
-  render(){
+  render(props){
 
     const defaultOptions = {
       loop: true,
@@ -19,8 +19,8 @@ class AnimacaoBanheira extends Component {
     return(
       <div>
         <Lottie options={defaultOptions}
-              height={250}
-              width={250}
+              height={200}
+              width={200}
               style={
                   {
                       padding: '0',

@@ -48,3 +48,11 @@ export const FormularioEdicaoGrupo = styled(Form.Group)`
         }
     }
 `;
+
+export const MenuDashboard = styled.div`
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-direction: row;
+    justify-content: space-between;
+`;

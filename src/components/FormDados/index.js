@@ -9,25 +9,46 @@ import profile_api from '../../services/profile_api';
 export default function FormCadastro(props) {
 
     const [error, setError] = useState({status: false, message: ''});
-
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const [nome, setNome] = useState('');
-    const [nomeOk, setNomeOk] = useState(false);
+    const [nomeOk, setNomeOk] = useState(null);
 
     const [sexo, setSexo] = useState('');
-    const [sexoOk, setSexoOk] = useState(false);
+    const [sexoOk, setSexoOk] = useState(null);
 
     const [data_nasc, setData_nasc] = useState('');
-    const [data_nascOk, setData_nascOk] = useState(false);
+    const [data_nascOk, setData_nascOk] = useState(null);
 
     const [senha, setSenha] = useState('');
-    const [senhaOk, setSenhaOk] = useState(false);
+    const [senhaOk, setSenhaOk] = useState(null);
 
     const [senha_conf, setSenhaConf] = useState('');
-    const [senhaConfOk, setSenhaConfOk] = useState(false);
+    const [senhaConfOk, setSenhaConfOk] = useState(null);
 
-    useEffect(() => { enableButton() });
+    useEffect(() => { 
+        enableButton(); 
+    });
+
+    useEffect(() => {
+        if(props.perfil) {
+            const {nome, sexo, data_nasc} = props.perfil;
+            setNome(nome);
+            setSexo(sexo);
+            setData_nasc(moment(data_nasc, 'DD/MM/YYYY').format('YYYY-MM-DD'));
+            
+            setNomeOk(true);
+            setSexoOk(true);
+            setData_nascOk(true);
+            setSenhaOk(true);
+            setSenhaConfOk(true);
+        }
+
+        return () => {
+            console.log("Fim. ");
+        }
+
+    }, [props]);
 
     const handleNome = e => {
         const rgx = new RegExp(/^[a-zA-Zà-úÀ-Ú ]{0,10}$/);
@@ -75,6 +96,27 @@ export default function FormCadastro(props) {
 
     }
 
+    const checkSenha = e => {
+        const TAM_SENHA = 4;
+        if (e.target.value.length === TAM_SENHA) {
+            setSenhaOk(true);
+        } else {
+            setSenhaOk(false);
+        }
+    }
+
+    const checkSenhaConf = e => {
+        const TAM_SENHA = 4;
+        if (e.target.value.length === TAM_SENHA) {
+            if(senha_conf === senha)
+                setSenhaConfOk(true);
+            else
+                setSenhaConfOk(false);
+        } else {
+            setSenhaConfOk(false);
+        }
+    }
+
     const handleSenha = e => {
         const rgx = new RegExp(/^[0-9]{0,4}$/);
         if (rgx.test(e.target.value)) {
@@ -85,12 +127,16 @@ export default function FormCadastro(props) {
     }
 
     const validateSenha = e => {
-        const TAM_SENHA = 4;
-        if (e.target.value.length === TAM_SENHA) {
-            setSenhaOk(true);
+        if(props.action === 'update') {
+            if(senha.length > 0) {
+                checkSenha(e);
+            } else {
+                setSenhaOk(true);
+            }
         } else {
-            setSenhaOk(false);
+            checkSenha(e);
         }
+        
     }
 
     const handleSenhaConf = e => {
@@ -103,18 +149,35 @@ export default function FormCadastro(props) {
     }
 
     const validateSenhaConf = e => {
-        const TAM_SENHA = 4;
-        if (e.target.value.length === TAM_SENHA) {
-            if(senha_conf === senha)
+        if(props.action === 'update') {
+            if(senha.length > 0) {
+                checkSenhaConf(e);
+            } else {
                 setSenhaConfOk(true);
-            else
-                setSenhaConfOk(false);
+            }
         } else {
-            setSenhaConfOk(false);
+           checkSenhaConf(e);
         }
     }
 
     const enableButton = () => {
+        
+        if(props.action === 'update') {
+            if(props.perfil.nome === nome) {
+                const TAM_SENHA = 4;
+                if(senha.length === TAM_SENHA && senhaConfOk) {
+                    setButtonDisabled(false);
+                    return true;
+                } else {
+                    setButtonDisabled(true);
+                    return false;
+                }
+            } else {
+                setButtonDisabled(false);
+                return true;
+            }
+        }
+        
         if (nomeOk && sexoOk && data_nascOk && senhaOk && senhaConfOk) {
             setButtonDisabled(false);
             return true;
@@ -123,31 +186,27 @@ export default function FormCadastro(props) {
             return false;
         }
     }
-
-    const resetAll = () => {
-        setNome('');
-        setNomeOk(false);
-        setSexo('');
-        setSexoOk(false);
-        setData_nasc('');
-        setData_nascOk(false);
-        setSenha('');
-        setSenhaOk(false);
-        setSenhaConf('');
-        setSenhaConfOk(false);
-        setButtonDisabled(true);
-    }
-
+    
     const handleSubmit = async e => {
         e.preventDefault();
-      
+
         try {
-            await profile_api.post('/cadastrar', {nome, senha, sexo, data_nasc, avatar: 'defaultuser.png'});
-            setError({status: false, message: ''});
-            resetAll();
-            props.redirect.history.push('/perfis');
+            if(props.action === 'update') {
+                const TAM_SENHA = 4;
+                const dadosParaAtualizar = {nome}
+                
+                if(senha.length === TAM_SENHA)
+                    dadosParaAtualizar.senha = senha;
+
+                await profile_api.put(`atualizar/${props.perfil.id_perfil}`, dadosParaAtualizar);
+                window.location.reload();
+                
+            } else {
+                await profile_api.post('/cadastrar', {nome, senha, sexo, data_nasc, avatar: 'default.png'});
+                props.history.push('/perfis');
+            }
         } catch (err) {
-            setError({status: true, message: err.response.data});
+            setError({status: true, message: err});
         }
         
     }
@@ -155,29 +214,29 @@ export default function FormCadastro(props) {
     return (
         <div>
             <FormularioCadastro onSubmit={handleSubmit}>
-                <FormularioCadastro.Label><FaUserAlt /> CRIAR NOVO PERFIL</FormularioCadastro.Label>
+            <FormularioCadastro.Label><span><FaUserAlt /> {props.action === 'update' ? 'ATUALIZAR' : 'CRIAR'} PERFIL</span></FormularioCadastro.Label>
 
                 <FormularioCadastro.Group>
                     <FormularioCadastro.Label>Nome</FormularioCadastro.Label>
                     <FormularioCadastro.Control value={nome} type="text" placeholder="Ex.: João/Maria " onChange={handleNome} onBlur={validateNome} onKeyUp={validateNome} />
-                    <Alert show={!nomeOk} variant="danger"><FormularioCadastro.Text className="text-muted">Forneça um nome ou apelido de 2 a 10 caracteres.</FormularioCadastro.Text></Alert>
+                    <Alert show={nomeOk === false} variant="danger"><FormularioCadastro.Text className="text-muted">Forneça um nome ou apelido de 2 a 10 caracteres.</FormularioCadastro.Text></Alert>
                 </FormularioCadastro.Group>
 
                 <FormularioCadastro.Group>
                     <Row>
                         <Col md={6}>
                             <FormularioCadastro.Label>Sexo</FormularioCadastro.Label>
-                            <FormularioCadastro.Control as="select" value={sexo} onChange={handleSexo} onBlur={validateSexo}>
+                            <FormularioCadastro.Control disabled={props.action === 'update'} readOnly={props.action === 'update'} as="select" value={sexo} onChange={handleSexo} onBlur={validateSexo}>
                                 <option disabled value="">Selecione...</option>
                                 <option value="M">Masculino</option>
                                 <option value="F">Feminino</option>
                             </FormularioCadastro.Control>
-                            <Alert show={!sexoOk} variant="danger"><FormularioCadastro.Text className="text-muted">Por favor, forneça um sexo válido (masculino ou feminino). </FormularioCadastro.Text></Alert>
+                            <Alert show={sexoOk === false} variant="danger"><FormularioCadastro.Text className="text-muted">Por favor, forneça um sexo válido (masculino ou feminino). </FormularioCadastro.Text></Alert>
                         </Col>
                         <Col md={6}>
                             <FormularioCadastro.Label>Data de Nascimento</FormularioCadastro.Label>
-                            <FormularioCadastro.Control type="date" value={data_nasc} onChange={handleData_nasc} onBlur={validateData_nasc} />
-                            <Alert show={!data_nascOk} variant="danger"><FormularioCadastro.Text className="text-muted">Forneça uma data de nascimento válida.</FormularioCadastro.Text></Alert>
+                            <FormularioCadastro.Control readOnly={props.action === 'update'} type="date" value={data_nasc} onChange={handleData_nasc} onBlur={validateData_nasc} />
+                            <Alert show={data_nascOk === false} variant="danger"><FormularioCadastro.Text className="text-muted">Forneça uma data de nascimento válida.</FormularioCadastro.Text></Alert>
                         </Col>
                     </Row>
                 </FormularioCadastro.Group>
@@ -186,18 +245,18 @@ export default function FormCadastro(props) {
                     <Row>
                         <Col md={6}>
                             <FormularioCadastro.Label>Senha numérica de 4 dígitos</FormularioCadastro.Label>
-                            <FormularioCadastro.Control type="password" value={senha} onChange={handleSenha} onBlur={validateSenha} onKeyUp={e => {validateSenha(e); validateSenhaConf(e)}}/>
-                            <Alert show={!senhaOk} variant="danger"><FormularioCadastro.Text className="text-muted">Digite uma senha de 4 dígitos numéricos. </FormularioCadastro.Text></Alert>
+                            <FormularioCadastro.Control type="password" value={senha} onChange={e => {handleSenha(e)}} onBlur={validateSenha} onKeyUp={e => {validateSenha(e); validateSenhaConf(e)}}/>
+                            <Alert show={senhaOk === false} variant="danger"><FormularioCadastro.Text className="text-muted">Digite uma senha de 4 dígitos numéricos. </FormularioCadastro.Text></Alert>
                         </Col>
                         <Col md={6}>
                             <FormularioCadastro.Label>Repita a sua senha</FormularioCadastro.Label>
                             <FormularioCadastro.Control type="password" value={senha_conf} onChange={handleSenhaConf} onBlur={validateSenhaConf} onKeyUp={validateSenhaConf}/>
-                            <Alert show={(senhaOk && !senhaConfOk)} variant="danger"><FormularioCadastro.Text className="text-muted">Senhas não conferem. Tente novamente. </FormularioCadastro.Text></Alert>
+                            <Alert show={(senhaOk === true && senhaConfOk === false)} variant="danger"><FormularioCadastro.Text className="text-muted">Senhas não conferem. Tente novamente. </FormularioCadastro.Text></Alert>
                         </Col>
                     </Row>
                 </FormularioCadastro.Group>
 
-                <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> CRIAR PERFIL</BotaoFormularioCadastro>
+                <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> SALVAR</BotaoFormularioCadastro>
                 <Alert variant="danger" show={error.status}>{error.message}</Alert>
             </FormularioCadastro>
         </div>
