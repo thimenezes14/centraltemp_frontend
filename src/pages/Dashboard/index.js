@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { AlertMessage, AlertMessageButtonGroup, AlertMessageButton } from '../../assets/global/style';
+import Tab from 'react-bootstrap/Tab';
 import profile_api from '../../services/profile_api';
 import { withRouter } from 'react-router-dom';
 import { FaShower, FaChartBar, FaEdit, FaArrowLeft, FaSyncAlt } from 'react-icons/fa';
 import { Abas } from './style';
-import FormDados from '../../components/FormDados';
-import Tab from 'react-bootstrap/Tab';
+
 import NavbarDashboard from '../../components/NavbarDashboard';
+import FormDados from '../../components/FormDados';
+import PainelBanho from '../../components/PainelBanho';
+
+
 
 function Dashboard(props) {
 
@@ -68,6 +72,7 @@ function Dashboard(props) {
                             <Abas className="bg-secondary nav nav-tabs nav-justified" activeKey={key} onSelect={k => setKey(k)}>
                                 <Tab eventKey="banho" title={<FaShower size={30} />}>
                                     BANHO
+                                    <PainelBanho />
                                 </Tab>
                                 <Tab eventKey="estatisticas" title={<FaChartBar size={30} />}>
                                     ESTATÍSTICAS

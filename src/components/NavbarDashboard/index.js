@@ -20,7 +20,7 @@ export default function NavbarDashboard(props) {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="mr-auto">
-                        <BotaoMenu variant="primary"><FaUserAlt /> {props.perfil.nome} </BotaoMenu>
+                        <BotaoMenu variant="primary" onClick={() => window.location.reload()}><FaUserAlt /> {props.perfil.nome} </BotaoMenu>
                         <BotaoMenu variant="danger" onClick={sair}  ><FaSignOutAlt /> SAIR</BotaoMenu>
                     </Nav>
                 </Navbar.Collapse>

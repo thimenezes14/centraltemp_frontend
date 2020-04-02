@@ -43,11 +43,6 @@ export default function FormCadastro(props) {
             setSenhaOk(true);
             setSenhaConfOk(true);
         }
-
-        return () => {
-            console.log("Fim. ");
-        }
-
     }, [props]);
 
     const handleNome = e => {
@@ -173,8 +168,13 @@ export default function FormCadastro(props) {
                     return false;
                 }
             } else {
-                setButtonDisabled(false);
-                return true;
+                if(nomeOk) {
+                    setButtonDisabled(false);
+                    return true;
+                } else {
+                    setButtonDisabled(true);
+                    return false;
+                }
             }
         }
         
@@ -193,7 +193,11 @@ export default function FormCadastro(props) {
         try {
             if(props.action === 'update') {
                 const TAM_SENHA = 4;
-                const dadosParaAtualizar = {nome}
+                const dadosParaAtualizar = {};
+
+                if(nome) {
+                    dadosParaAtualizar.nome = nome;
+                }
                 
                 if(senha.length === TAM_SENHA)
                     dadosParaAtualizar.senha = senha;
