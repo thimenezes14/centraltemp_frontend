@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FormularioCadastro, BotaoFormularioCadastro } from './style';
+import { FormularioCadastro, BotaoFormularioCadastro, GrupoOpcoesImagem, OpcaoImagem } from './style';
 import { FaCheckCircle, FaUserAlt } from 'react-icons/fa';
 import moment from 'moment';
 import { Row, Col, Alert } from 'react-bootstrap';
-
 import profile_api from '../../services/profile_api';
+import avatar_path from '../../services/avatar_path';
 
 export default function FormCadastro(props) {
 
@@ -26,16 +26,29 @@ export default function FormCadastro(props) {
     const [senha_conf, setSenhaConf] = useState('');
     const [senhaConfOk, setSenhaConfOk] = useState(null);
 
+    const [avatarSelecionado, setAvatarSelecionado] = useState('default.png');
+    const [avatares, setAvatares] = useState([]);
+
+    const carregarAvatares = async () => {
+        const imagens = (await profile_api.get('imagens')).data
+        setAvatares(imagens);
+    }
+
+    useEffect(()=> {
+        carregarAvatares();
+    }, []);
+
     useEffect(() => { 
         enableButton(); 
     });
 
     useEffect(() => {
         if(props.perfil) {
-            const {nome, sexo, data_nasc} = props.perfil;
+            const {nome, sexo, data_nasc, avatar} = props.perfil;
             setNome(nome);
             setSexo(sexo);
             setData_nasc(moment(data_nasc, 'DD/MM/YYYY').format('YYYY-MM-DD'));
+            setAvatarSelecionado(avatar)
             
             setNomeOk(true);
             setSexoOk(true);
@@ -158,7 +171,7 @@ export default function FormCadastro(props) {
     const enableButton = () => {
         
         if(props.action === 'update') {
-            if(props.perfil.nome === nome) {
+            if(props.perfil.nome === nome && props.perfil.avatar === avatarSelecionado) {
                 const TAM_SENHA = 4;
                 if(senha.length === TAM_SENHA && senhaConfOk) {
                     setButtonDisabled(false);
@@ -202,15 +215,18 @@ export default function FormCadastro(props) {
                 if(senha.length === TAM_SENHA)
                     dadosParaAtualizar.senha = senha;
 
+                if(avatarSelecionado)
+                    dadosParaAtualizar.avatar = avatarSelecionado;
+
                 await profile_api.put(`atualizar/${props.perfil.id_perfil}`, dadosParaAtualizar);
                 window.location.reload();
                 
             } else {
-                await profile_api.post('/cadastrar', {nome, senha, sexo, data_nasc, avatar: 'default.png'});
+                await profile_api.post('/cadastrar', {nome, senha, sexo, data_nasc, avatar: avatarSelecionado});
                 props.history.push('/perfis');
             }
         } catch (err) {
-            setError({status: true, message: err});
+            setError({status: true, message: err.response.data.toString()});
         }
         
     }
@@ -258,6 +274,26 @@ export default function FormCadastro(props) {
                             <Alert show={(senhaOk === true && senhaConfOk === false)} variant="danger"><FormularioCadastro.Text className="text-muted">Senhas não conferem. Tente novamente. </FormularioCadastro.Text></Alert>
                         </Col>
                     </Row>
+                </FormularioCadastro.Group>
+
+                <FormularioCadastro.Group>
+                <FormularioCadastro.Label>Avatar</FormularioCadastro.Label>
+                    <GrupoOpcoesImagem>
+                        {avatares.map(avatar => (
+                            <OpcaoImagem key={avatar} ativo={avatar === avatarSelecionado}>
+                                <label>
+                                    <FormularioCadastro.Check 
+                                        type="radio" 
+                                        value={avatar} 
+                                        name="avatar" 
+                                        checked={avatar === avatarSelecionado}
+                                        onChange={()=> setAvatarSelecionado(avatar)}
+                                    />
+                                    <img key={avatar} src={`${avatar_path}${avatar}`} alt={avatar} />
+                                </label>
+                            </OpcaoImagem>
+                        ))}
+                    </GrupoOpcoesImagem>
                 </FormularioCadastro.Group>
 
                 <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> SALVAR</BotaoFormularioCadastro>

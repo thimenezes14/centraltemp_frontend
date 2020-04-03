@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { AlertMessage, AlertMessageButtonGroup, AlertMessageButton } from '../../assets/global/style';
 import Tab from 'react-bootstrap/Tab';
+import Accordion from 'react-bootstrap/Accordion';
+import Button from 'react-bootstrap/Button';
 import profile_api from '../../services/profile_api';
 import { withRouter } from 'react-router-dom';
 import { FaShower, FaChartBar, FaEdit, FaArrowLeft, FaSyncAlt } from 'react-icons/fa';
-import { Abas } from './style';
+import { Abas, ContainerExclusao } from './style';
 
 import NavbarDashboard from '../../components/NavbarDashboard';
 import FormDados from '../../components/FormDados';
 import PainelBanho from '../../components/PainelBanho';
+import ModalExclusao from '../../components/ModalExclusao';
 
 
 
 function Dashboard(props) {
 
     const [key, setKey] = useState('banho');
-
     const [perfil, setPerfil] = useState({});
     const [loading, setLoading] = useState({ status: true, mensagem: 'Carregando sessão. Aguarde...' });
     const [erro, setErro] = useState({ status: null, mensagem: null });
+
+    const [modalShow, setModalShow] = useState(false);
 
     useEffect(() => {
         const carregarPerfil = async () => {
@@ -65,21 +69,44 @@ function Dashboard(props) {
                     </AlertMessage>) :
                     <>
                         <NavbarDashboard perfil={perfil} history={props.history} />
-
+                        <ModalExclusao perfil={perfil} show={modalShow} onHide={()=> setModalShow(!modalShow)} history={props.history} />
 
                         <div className="container container-fluid text-center">
 
                             <Abas className="bg-secondary nav nav-tabs nav-justified" activeKey={key} onSelect={k => setKey(k)}>
                                 <Tab eventKey="banho" title={<FaShower size={30} />}>
                                     BANHO
-                                    <PainelBanho />
+                                    <hr className="hr bg-white" />
+                                    <PainelBanho history={props.history} perfil={perfil} />
                                 </Tab>
                                 <Tab eventKey="estatisticas" title={<FaChartBar size={30} />}>
                                     ESTATÍSTICAS
+                                    <hr className="hr bg-white" />
                                 </Tab>
                                 <Tab eventKey="dados" title={<FaEdit size={30} />} >
                                     MEUS DADOS
-                                    <FormDados action="update" perfil={perfil} />
+                                    <hr className="hr bg-white" />
+                                    <Accordion>
+                                        <Accordion.Toggle block as={Button} variant="danger" eventKey="0">
+                                            EXCLUIR PERFIL
+                                        </Accordion.Toggle>
+                                        <Accordion.Collapse eventKey="0">
+                                            <ContainerExclusao>
+                                                <p>
+                                                    Aqui você poderá excluir o seu perfil. 
+                                                    Ao fazer isso, todos os seus dados serão apagados, inclusive seu histórico.
+                                                    Esta ação não poderá ser desfeita.
+                                                </p>
+                                                <Button variant="danger" onClick={()=> setModalShow(!modalShow)}>Eu quero excluir meu perfil</Button>
+                                            </ContainerExclusao>
+                                        </Accordion.Collapse>
+                                        <Accordion.Toggle block as={Button} variant="info" eventKey="1">
+                                            ATUALIZAR INFORMAÇÕES
+                                        </Accordion.Toggle>
+                                        <Accordion.Collapse eventKey="1">
+                                            <FormDados action="update" perfil={perfil} />
+                                        </Accordion.Collapse>
+                                    </Accordion> 
                                 </Tab>
                             </Abas>
                         </div>

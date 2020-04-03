@@ -41,7 +41,6 @@ export const CardCarousel = styled(Card)`
     img {
         width: 50%;
         margin: 0 auto;
-        border-radius: 50%;
 
         @media (min-width: 768px) {
             width: 70% !important;
@@ -72,7 +71,6 @@ export const ListaPerfisItem = styled.li`
     
     img {
         width: 50px;
-        border-radius: 50%;
         filter: grayscale(100%);
         transition: 0.5s;
     }

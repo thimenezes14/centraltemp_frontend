@@ -23,16 +23,33 @@ function Chuveiro(props) {
   const [tempRange, setTempRange] = useState(35);
 
   async function carregarDadosDoChuveiro() {
-    const chuveiro = (await shower_api.get('chuveiro')).data;
-    return chuveiro;
+    try {
+      const chuveiro = (await shower_api.get('/verificarchuveiro')).data;
+      return chuveiro;
+    } catch (err) {
+      throw err;
+    }
   }
+
+  function finalizarBanho() {
+    shower_api.post('finalizar')
+        .then(()=> console.info("Histórico atualizado. "))
+        .catch(err => {
+            if(err.response.status === 403)
+                console.info(err);
+            else
+                console.log(err);
+        })
+}
 
   useEffect(() => {
 
+    finalizarBanho();
+
     carregarDadosDoChuveiro()
       .then(chuveiro => {
-        setChuveiroEstado({ status: chuveiro.ligado, temperatura: chuveiro.temp_escolhida })
-        setTempRange(chuveiro.temp_escolhida)
+        setChuveiroEstado({ status: chuveiro.ligado, temperatura: chuveiro.temperatura })
+        setTempRange(chuveiro.temperatura)
       })
       .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro.`, descricao: errorHandler(error).toString() }))
       .finally(() => setLoading({ status: false, mensagem: '' }))
@@ -43,7 +60,7 @@ function Chuveiro(props) {
 
     setLoading({ status: true, mensagem: 'Ligando chuveiro...' });
 
-    await shower_api.post('chuveiro', { ligado: true, temperatura })
+    await shower_api.post('/ligarchuveiromanual', { temperatura, ligado: true })
       .then(res => setChuveiroEstado({ status: res.data.ligado, temperatura: res.data.temperatura }))
       .catch(err => setErro({ status: true, mensagem: `Erro ao ligar chuveiro. ${err.response.data}` }))
       .finally(() => setLoading({ status: false, mensagem: '' }));

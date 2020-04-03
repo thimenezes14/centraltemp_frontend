@@ -26,3 +26,33 @@ export const BotaoFormularioCadastro = styled(Button)`
     }
 `;
 
+export const GrupoOpcoesImagem = styled.div`
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+`;
+
+export const OpcaoImagem = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: ${props => props.ativo ? 'rgba(0, 79, 154, 0.25)' : 'none'};
+    padding: 10px;
+    margin: 10px;
+    border-radius: 3px;
+    cursor: pointer;
+
+    img {
+        max-width: 60px;
+        cursor: pointer;
+    }
+
+    input[type=radio] {
+        display: none;
+    }
+
+    transition: 0.5s;
+
+`;
+

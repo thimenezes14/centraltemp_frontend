@@ -4,7 +4,8 @@ import {Modal, Button} from 'react-bootstrap';
 export default function ModalConfirmacaoAcao(props) {
     return (
       <Modal
-        {...props}
+        show={props.show}
+        onHide={props.onHide}
         size="sm"
         aria-labelledby="contained-modal-title-vcenter"
         centered
@@ -22,7 +23,7 @@ export default function ModalConfirmacaoAcao(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={props.onHide}>Não</Button>
-          <Button variant="success" onClick={()=> alert("Iniciando banho com temperatura de " + props.temperatura_escolhida + " °C")}>Sim</Button>
+          <Button variant="success" onClick={props.sucesso}>Sim</Button>
         </Modal.Footer>
       </Modal>
     );

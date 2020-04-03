@@ -18,7 +18,7 @@ export const ChuveiroStatus = styled.div`
     display: flex;
     align-content: center;
     align-items: center;
-    background-color: ${props => props.status === null ? 'gray' : props.status === true ? 'green' : 'red'};
+    background-color: ${props => props.status === null ? 'gray' : props.status === true ? 'red' : 'green'};
     border-radius: 5px;
 
 `;

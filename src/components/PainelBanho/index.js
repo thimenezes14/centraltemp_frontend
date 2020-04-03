@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {AlertMessage} from '../../assets/global/style';
 import shower_api from '../../services/shower_api';
 import {FaRegCheckCircle, FaShower, FaThermometerHalf, FaSyncAlt} from 'react-icons/fa';
-
+import {logout} from '../../services/auth';
 
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -12,36 +12,36 @@ import {CardTemperatura, CardTemperaturaInfo, CardTemperaturaBotao, Painel, Chuv
 import ModalConfirmacaoAcao from '../ModalConfirmacaoAcao';
 
 
-export default function PainelBanho() {
+export default function PainelBanho(props) {
     const [recomendacao, setRecomendacao] = useState({});
     const [temperatura, setTemperatura] = useState(37);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState({status: true});
     const [error, setError] = useState({status: false});
     const [alertError, setAlertError] = useState(false);
-    const [chuveiroLigado, setChuveiroLigado] = useState(null);
+    const [chuveiro, setChuveiro] = useState({});
     const [modalShow, setModalShow] = useState(false);
 
     const carregarRecomendacoes = async () => {
         try {
-            setLoading(true);
+            setLoading({status: true, message: 'Carregando recomendações...'});
             const recomendacao = (await shower_api.get('/recomendartemperatura')).data;
             setRecomendacao(recomendacao);
             setTemperatura(recomendacao.temperatura_recomendada);
             setError({status: false});
             setAlertError(false);
+            
         } catch (err) {
             setError({status: true, message: 'Não foi possível carregar preferências individuais. A recomendação genérica ideal será utilizada. '});
             setAlertError(true);
             setRecomendacao({temperatura_recomendada: 37, limites: {min: 30, max: 44}})
             console.log(err);
-        } finally {
             setLoading(false);
         }
 
         try {
-            setLoading(true);
-            const chuveiroLigado = (await shower_api.get('/verificarchuveiro')).data;
-            setChuveiroLigado(chuveiroLigado);
+            setLoading({status: true, message: 'Obtendo estado do chuveiro...'});
+            const chuveiro = (await shower_api.get('/verificarchuveiro')).data;
+            setChuveiro(chuveiro);
         } catch (err) {
             setError({status: true, message: 'Não foi possível obter estado do chuveiro. '});
             setAlertError(true);
@@ -56,14 +56,28 @@ export default function PainelBanho() {
         carregarRecomendacoes();
     }, []);
 
+    const registrar = async () => {
+        setLoading({status: true, message: 'Registrando banho...'});
+        await shower_api.post('/registrar', {id_perfil: props.perfil.id_perfil, temp_escolhida: temperatura})
+            .then(()=> {
+                logout();
+                setLoading({status: false});
+                props.history.push('/banho');
+            })
+            .catch(err => {
+                setError({status: true, message: `Não foi possível completar a operação. `, descricao: err.toString()});
+                setLoading({status: false});
+            })
+    }
+
 
     return (
         <>
         <Painel>
-            <ModalConfirmacaoAcao show={modalShow} onHide={() => setModalShow(false)} temperatura_escolhida={temperatura} />
-            {loading && <AlertMessage variant="info">Obtendo preferências de usuário. Aguarde...</AlertMessage>}
+            <ModalConfirmacaoAcao show={modalShow} onHide={() => setModalShow(false)} temperatura_escolhida={temperatura} sucesso={registrar}/>
+            {loading.status && <AlertMessage variant="info">{loading.message}</AlertMessage>}
             {error.status && <AlertMessage variant="danger" dismissible show={alertError} onClose={() => setAlertError(false)}>{error.message}</AlertMessage>}
-            {!loading && 
+            {!loading.status && 
             <>
                 <CardTemperatura color="#9dc6a7">
                     <h6 className="text-dark">RECOMENDADO:</h6>
@@ -71,8 +85,8 @@ export default function PainelBanho() {
                         {recomendacao.temperatura_recomendada}
                         <span>°C</span>
                     </CardTemperaturaInfo>
-                    <CardTemperaturaBotao variant="success" disabled={chuveiroLigado} onClick={() => {setModalShow(true); setTemperatura(recomendacao.temperatura_recomendada)}}><span><FaRegCheckCircle /> ACEITAR</span></CardTemperaturaBotao>
-                    <CardTemperaturaBotao variant="info" disabled={chuveiroLigado} onClick={carregarRecomendacoes}><span><FaSyncAlt /> ATUALIZAR </span></CardTemperaturaBotao>
+                    <CardTemperaturaBotao variant="success" disabled={chuveiro.ligado} onClick={() => {setModalShow(true); setTemperatura(recomendacao.temperatura_recomendada)}}><span><FaRegCheckCircle /> ACEITAR</span></CardTemperaturaBotao>
+                    <CardTemperaturaBotao variant="info" onClick={carregarRecomendacoes}><span><FaSyncAlt /> ATUALIZAR </span></CardTemperaturaBotao>
                 </CardTemperatura>
                 <CardTemperatura color="#424874">
                     <h6 className="text-white">PERSONALIZAR:</h6>
@@ -80,7 +94,7 @@ export default function PainelBanho() {
                         {temperatura}
                         <span>°C</span>
                     </CardTemperaturaInfo>
-                    <CardTemperaturaBotao variant="success" disabled={chuveiroLigado} onClick={() => {setModalShow(true); setTemperatura(temperatura)}}><span><FaThermometerHalf /> DEFINIR</span></CardTemperaturaBotao>
+                    <CardTemperaturaBotao variant="success" disabled={chuveiro.ligado} onClick={() => {setModalShow(true); setTemperatura(temperatura)}}><span><FaThermometerHalf /> DEFINIR</span></CardTemperaturaBotao>
                     <RangeSlider
                         min={recomendacao.limites.min}
                         max={recomendacao.limites.max}
@@ -89,6 +103,7 @@ export default function PainelBanho() {
                         variant="info"
                         size="lg"
                         onChange={e => setTemperatura(Number(e.target.value))}
+                        disabled={chuveiro.ligado}
                       />
                 </CardTemperatura>
 
@@ -97,9 +112,9 @@ export default function PainelBanho() {
             }
         </Painel>
         <Painel>
-            {!loading && 
+            {!loading.status && 
                 <>
-                    <ChuveiroStatus status={chuveiroLigado}>
+                    <ChuveiroStatus status={chuveiro.ligado}>
                         <FaShower size={32} />
                     </ChuveiroStatus>
                 </>
