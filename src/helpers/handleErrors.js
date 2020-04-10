@@ -2,7 +2,7 @@ export default function carregarErroDaRequisicao(error) {
     let msg = '';
 
     if (error.response) {
-        msg = `Status HTTP recebido: ${error.response.status}`;
+        msg = `HTTP Status ${error.response.status}: ${error.response.data}`;
     } else if (error.request) {
         msg = `Não houve resposta à solicitação.`;
     } else {

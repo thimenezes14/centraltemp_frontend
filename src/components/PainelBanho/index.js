@@ -11,6 +11,8 @@ import {CardTemperatura, CardTemperaturaInfo, CardTemperaturaBotao, Painel, Chuv
 
 import ModalConfirmacaoAcao from '../ModalConfirmacaoAcao';
 
+import getError from '../../helpers/handleErrors';
+
 
 export default function PainelBanho(props) {
     const [recomendacao, setRecomendacao] = useState({});
@@ -22,6 +24,7 @@ export default function PainelBanho(props) {
     const [modalShow, setModalShow] = useState(false);
 
     const carregarRecomendacoes = async () => {
+        //console.clear();
         try {
             setLoading({status: true, message: 'Carregando recomendações...'});
             const recomendacao = (await shower_api.get('/recomendartemperatura')).data;
@@ -31,10 +34,9 @@ export default function PainelBanho(props) {
             setAlertError(false);
             
         } catch (err) {
-            setError({status: true, message: 'Não foi possível carregar preferências individuais. A recomendação genérica ideal será utilizada. '});
+            setError({status: true, message: 'Não foi possível carregar preferências individuais. A recomendação genérica ideal será utilizada. ', descricao: getError(err)});
             setAlertError(true);
             setRecomendacao({temperatura_recomendada: 37, limites: {min: 30, max: 44}})
-            console.log(err);
             setLoading(false);
         }
 
@@ -43,10 +45,9 @@ export default function PainelBanho(props) {
             const chuveiro = (await shower_api.get('/verificarchuveiro')).data;
             setChuveiro(chuveiro);
         } catch (err) {
-            setError({status: true, message: 'Não foi possível obter estado do chuveiro. '});
+            setError({status: true, message: 'Não foi possível obter estado do chuveiro. ', descricao: getError(err)});
             setAlertError(true);
             setRecomendacao({temperatura_recomendada: 37, limites: {min: 30, max: 44}})
-            console.log(err);
         } finally {
             setLoading(false);
         }
@@ -58,6 +59,7 @@ export default function PainelBanho(props) {
 
     const registrar = async () => {
         setLoading({status: true, message: 'Registrando banho...'});
+        setAlertError(false);
         await shower_api.post('/registrar', {id_perfil: props.perfil.id_perfil, temp_escolhida: temperatura})
             .then(()=> {
                 logout();
@@ -65,18 +67,35 @@ export default function PainelBanho(props) {
                 props.history.push('/banho');
             })
             .catch(err => {
-                setError({status: true, message: `Não foi possível completar a operação. `, descricao: err.toString()});
+                setError({status: true, message: `Não foi possível completar a operação. `, descricao: getError(err)});
                 setLoading({status: false});
+                setAlertError(true);
+                
+                if(err.response) {
+                    if(err.response.status === 403) {
+                        setChuveiro({ligado: true});
+                    }
+                }
+                
             })
     }
 
 
     return (
         <>
+        {error.status && 
+            <AlertMessage variant="danger" dismissible show={alertError} onClose={() => setAlertError(false)}>
+                <AlertMessage.Heading>
+                    {error.message}
+                </AlertMessage.Heading>
+                <div className="text-muted">
+                    {error.descricao}
+                </div>
+            </AlertMessage>
+        }
         <Painel>
             <ModalConfirmacaoAcao show={modalShow} onHide={() => setModalShow(false)} temperatura_escolhida={temperatura} sucesso={registrar}/>
             {loading.status && <AlertMessage variant="info">{loading.message}</AlertMessage>}
-            {error.status && <AlertMessage variant="danger" dismissible show={alertError} onClose={() => setAlertError(false)}>{error.message}</AlertMessage>}
             {!loading.status && 
             <>
                 <CardTemperatura color="#9dc6a7">

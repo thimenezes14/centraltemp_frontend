@@ -5,19 +5,23 @@ import Accordion from 'react-bootstrap/Accordion';
 import Button from 'react-bootstrap/Button';
 import profile_api from '../../services/profile_api';
 import { withRouter } from 'react-router-dom';
-import { FaShower, FaChartBar, FaEdit, FaArrowLeft, FaSyncAlt } from 'react-icons/fa';
+import { FaShower, FaChartBar, FaEdit, FaArrowLeft, FaSyncAlt, FaDatabase, FaInfo, FaEraser, FaPen } from 'react-icons/fa';
 import { Abas, ContainerExclusao } from './style';
+
+import {logout} from '../../services/auth';
 
 import NavbarDashboard from '../../components/NavbarDashboard';
 import FormDados from '../../components/FormDados';
 import PainelBanho from '../../components/PainelBanho';
 import ModalExclusao from '../../components/ModalExclusao';
+import StatsBanho from '../../components/StatsBanho';
+import HistBanho from '../../components/HistBanho';
 
-
+import getError from '../../helpers/handleErrors';
 
 function Dashboard(props) {
 
-    const [key, setKey] = useState('banho');
+    const [key, setKey] = useState('informacoes');
     const [perfil, setPerfil] = useState({});
     const [loading, setLoading] = useState({ status: true, mensagem: 'Carregando sessão. Aguarde...' });
     const [erro, setErro] = useState({ status: null, mensagem: null });
@@ -36,10 +40,15 @@ function Dashboard(props) {
                 setLoading({ status: false, mensagem: '' });
             })
             .catch(err => {
-                setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.`, descricao: err.toString() });
+                setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.`, descricao: getError(err) });
                 setLoading({ status: false, mensagem: '' });
-                if (err.response.status === 403) {
-                    props.history.push({ pathname: '/perfis', mensagem: err.response.data });
+                logout();
+                if(err.response) {
+                    if(err.response.status === 403) {
+                        props.history.push({ pathname: '/perfis', mensagem: err.response.data });
+                    }
+                } else {
+                    props.history.push('/');
                 }
             })
 
@@ -79,16 +88,30 @@ function Dashboard(props) {
                                     <hr className="hr bg-white" />
                                     <PainelBanho history={props.history} perfil={perfil} />
                                 </Tab>
-                                <Tab eventKey="estatisticas" title={<FaChartBar size={30} />}>
-                                    ESTATÍSTICAS
+                                <Tab eventKey="informacoes" title={<FaInfo size={30} />}>
+                                    INFORMAÇÕES
                                     <hr className="hr bg-white" />
+                                    <Accordion>
+                                        <Accordion.Toggle block as={Button} variant="primary" eventKey="0">
+                                            <span><FaDatabase /> MEU HISTÓRICO</span>
+                                        </Accordion.Toggle>
+                                        <Accordion.Collapse eventKey="0">
+                                            <HistBanho perfil={perfil}/>
+                                        </Accordion.Collapse>
+                                        <Accordion.Toggle block as={Button} variant="dark" eventKey="1">
+                                            <span><FaChartBar /> ESTATÍSTICAS</span>
+                                        </Accordion.Toggle>
+                                        <Accordion.Collapse eventKey="1">
+                                            <StatsBanho />
+                                        </Accordion.Collapse>
+                                    </Accordion>
                                 </Tab>
                                 <Tab eventKey="dados" title={<FaEdit size={30} />} >
                                     MEUS DADOS
                                     <hr className="hr bg-white" />
                                     <Accordion>
                                         <Accordion.Toggle block as={Button} variant="danger" eventKey="0">
-                                            EXCLUIR PERFIL
+                                            <span><FaEraser /> EXCLUIR PERFIL</span>
                                         </Accordion.Toggle>
                                         <Accordion.Collapse eventKey="0">
                                             <ContainerExclusao>
@@ -101,7 +124,7 @@ function Dashboard(props) {
                                             </ContainerExclusao>
                                         </Accordion.Collapse>
                                         <Accordion.Toggle block as={Button} variant="info" eventKey="1">
-                                            ATUALIZAR INFORMAÇÕES
+                                            <span><FaPen /> ATUALIZAR INFORMAÇÕES</span>
                                         </Accordion.Toggle>
                                         <Accordion.Collapse eventKey="1">
                                             <FormDados action="update" perfil={perfil} />

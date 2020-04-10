@@ -23,7 +23,7 @@ export default function ModalConfirmacaoAcao(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={props.onHide}>Não</Button>
-          <Button variant="success" onClick={props.sucesso}>Sim</Button>
+          <Button variant="success" onClick={()=> {props.sucesso(); props.onHide()}}>Sim</Button>
         </Modal.Footer>
       </Modal>
     );

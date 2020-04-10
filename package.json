@@ -1,7 +1,7 @@
 {
-  "name": "interfaces",
-  "version": "0.1.0",
-  "private": true,
+  "name": "interface_web",
+  "version": "1.0.0",
+  "private": false,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",

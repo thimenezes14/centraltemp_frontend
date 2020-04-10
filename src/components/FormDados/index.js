@@ -6,6 +6,8 @@ import { Row, Col, Alert } from 'react-bootstrap';
 import profile_api from '../../services/profile_api';
 import avatar_path from '../../services/avatar_path';
 
+import getError from '../../helpers/handleErrors';
+
 export default function FormCadastro(props) {
 
     const [error, setError] = useState({status: false, message: ''});
@@ -218,7 +220,7 @@ export default function FormCadastro(props) {
                 if(avatarSelecionado)
                     dadosParaAtualizar.avatar = avatarSelecionado;
 
-                await profile_api.put(`atualizar/${props.perfil.id_perfil}`, dadosParaAtualizar);
+                await profile_api.put(`/atualizar/${props.perfil.id_perfil}`, dadosParaAtualizar);
                 window.location.reload();
                 
             } else {
@@ -226,7 +228,7 @@ export default function FormCadastro(props) {
                 props.history.push('/perfis');
             }
         } catch (err) {
-            setError({status: true, message: err.response.data.toString()});
+            setError({status: true, message: getError(err)});
         }
         
     }

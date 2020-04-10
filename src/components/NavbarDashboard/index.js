@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Navbar, Nav } from 'react-bootstrap';
 import { BotaoMenu } from './style';
-import { FaSignOutAlt, FaUserAlt, FaChalkboardTeacher } from 'react-icons/fa';
+import { FaSignOutAlt, FaChalkboardTeacher } from 'react-icons/fa';
 import avatar_path from '../../services/avatar_path';
 
 import {logout} from '../../services/auth';

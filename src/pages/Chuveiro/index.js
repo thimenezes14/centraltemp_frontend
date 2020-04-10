@@ -11,7 +11,7 @@ import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 import RangeSlider from 'react-bootstrap-range-slider';
 
 import shower_api from '../../services/shower_api';
-import errorHandler from '../../helpers/handleErrors';
+import getError from '../../helpers/handleErrors';
 
 function Chuveiro(props) {
 
@@ -35,10 +35,7 @@ function Chuveiro(props) {
     shower_api.post('finalizar')
         .then(()=> console.info("Histórico atualizado. "))
         .catch(err => {
-            if(err.response.status === 403)
-                console.info(err);
-            else
-                console.log(err);
+          console.error(getError(err));
         })
 }
 
@@ -51,8 +48,8 @@ function Chuveiro(props) {
         setChuveiroEstado({ status: chuveiro.ligado, temperatura: chuveiro.temperatura })
         setTempRange(chuveiro.temperatura)
       })
-      .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro.`, descricao: errorHandler(error).toString() }))
-      .finally(() => setLoading({ status: false, mensagem: '' }))
+      .catch(err => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro.`, descricao: getError(err) }))
+      .finally(() => setLoading({ status: false }))
 
   }, []);
 
@@ -62,8 +59,8 @@ function Chuveiro(props) {
 
     await shower_api.post('/ligarchuveiromanual', { temperatura, ligado: true })
       .then(res => setChuveiroEstado({ status: res.data.ligado, temperatura: res.data.temperatura }))
-      .catch(err => setErro({ status: true, mensagem: `Erro ao ligar chuveiro. ${err.response.data}` }))
-      .finally(() => setLoading({ status: false, mensagem: '' }));
+      .catch(err => setErro({ status: true, mensagem: `Erro ao ligar chuveiro. ${err.response.data}`, descricao: getError(err) }))
+      .finally(() => setLoading({ status: false }));
   }
 
   const handleLigarChuveiro = async temperatura => {
@@ -75,7 +72,7 @@ function Chuveiro(props) {
           ligarChuveiro(temperatura);
         }
       })
-      .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro. ${errorHandler(error)}` }))
+      .catch(err => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro. ${getError(err)}` }))
   }
 
   return (

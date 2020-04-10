@@ -18,7 +18,7 @@ export const ChuveiroStatus = styled.div`
     display: flex;
     align-content: center;
     align-items: center;
-    background-color: ${props => props.status === null ? 'gray' : props.status === true ? 'red' : 'green'};
+    background-color: ${props => props.status === null || props.status === undefined ? 'gray' : props.status === true ? 'red' : 'green'};
     border-radius: 5px;
 
 `;
@@ -32,6 +32,17 @@ export const CardTemperatura = styled(Card)`
     background-color: ${props => props.color};
     padding: 5px;
     margin-bottom: 10px;
+`;
+
+export const CardStatus = styled(Card)`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    background-color: inherit;
+    padding: 5px;
+    margin: 10px;
 `;
 
 export const CardTemperaturaInfo = styled.div`

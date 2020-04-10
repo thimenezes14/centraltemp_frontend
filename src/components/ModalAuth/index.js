@@ -47,6 +47,11 @@ export default function Modal(props) {
         } catch (err) {
             setBotaoLoading(false);
             setError({status: true, message: err.response.data});
+            if(err.response) {
+                if(err.response.status === 404) {
+                    window.location.reload();
+                }
+            }
         }
 
     }

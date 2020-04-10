@@ -9,6 +9,8 @@ import profile_api from '../../services/profile_api';
 import shower_api from '../../services/shower_api';
 import SeletorPerfis from '../../components/SeletorPerfis';
 
+import getError from '../../helpers/handleErrors';
+
 function Perfis(props) {
 
     const [alertShow, setAlertShow] = useState(true);
@@ -26,10 +28,7 @@ function Perfis(props) {
         shower_api.post('finalizar')
             .then(()=> console.info("Histórico atualizado. "))
             .catch(err => {
-                if(err.response.status === 403)
-                    console.info(err);
-                else
-                    console.log(err);
+                console.log(getError(err));
             })
     }
 
@@ -41,7 +40,7 @@ function Perfis(props) {
             .then(perfis => {
                 setPerfis(perfis);
             })
-            .catch(error => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.`, descricao: error.toString() }))
+            .catch(err => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor de perfis.`, descricao: getError(err) }))
             .finally(() => setLoading({ status: false, mensagem: '', descricao: '' }))
 
     }, []);
