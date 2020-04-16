@@ -41,13 +41,13 @@ export const Classificador = styled.span`
     background-color: ${props => {
         switch(props.classificacao) {
             case 1:
-                return 'green';
+                return '#0F9D58';
             case 2: 
-                return 'blue';
+                return '#4285F4';
             case 3:
-                return 'yellow';
+                return '#F4B400';
             default:
-                return 'red';
+                return '#DB4437';
         }
     }};
     color: ${props => {

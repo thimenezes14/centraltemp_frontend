@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {AlertMessage} from '../../assets/global/style';
 import shower_api from '../../services/shower_api';
-import {FaRegCheckCircle, FaShower, FaThermometerHalf, FaSyncAlt} from 'react-icons/fa';
+import {FaRegCheckCircle, FaShower, FaThermometerHalf, FaSyncAlt, FaCalculator} from 'react-icons/fa';
 import {logout} from '../../services/auth';
 
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
@@ -104,6 +104,7 @@ export default function PainelBanho(props) {
                         {recomendacao.temperatura_recomendada}
                         <span>°C</span>
                     </CardTemperaturaInfo>
+                    <div className="text-dark text-center p-1"><span><FaCalculator /> <strong>{recomendacao.precisao_aproximada}%</strong></span></div>
                     <CardTemperaturaBotao variant="success" disabled={chuveiro.ligado} onClick={() => {setModalShow(true); setTemperatura(recomendacao.temperatura_recomendada)}}><span><FaRegCheckCircle /> ACEITAR</span></CardTemperaturaBotao>
                     <CardTemperaturaBotao variant="info" onClick={carregarRecomendacoes}><span><FaSyncAlt /> ATUALIZAR </span></CardTemperaturaBotao>
                 </CardTemperatura>

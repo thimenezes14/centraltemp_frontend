@@ -18,6 +18,7 @@ import shower_api from '../../services/shower_api';
 export default function HistBanho(props) {
     const DEFAULT_PER_PAGE = 5;
     const DEFAULT_CLASSIFICATION = 0;
+    const perfil = props.perfil;
     
     const [isLoading, setIsLoading] = useState(true);
     
@@ -55,7 +56,7 @@ export default function HistBanho(props) {
     useEffect(()=> {
         const carregarHistorico = async () => {
             try {
-                const historico = await shower_api.get('/historico/perfil', {params: {id_perfil: props.perfil.id_perfil}});
+                const historico = await shower_api.get('/historico/perfil', {params: {id_perfil: perfil.id_perfil}});
                 return historico.data;
             } catch (err) {
                 throw err;
@@ -70,9 +71,9 @@ export default function HistBanho(props) {
                 setIsLoading(false);
             })
             .catch(err => {
-                console.err(err);
+                console.error(err);
             })
-    }, [props]);
+    }, [perfil]);
 
     useEffect(()=> {
         const botoes = [];

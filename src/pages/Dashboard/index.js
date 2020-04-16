@@ -102,7 +102,7 @@ function Dashboard(props) {
                                             <span><FaChartBar /> ESTATÍSTICAS</span>
                                         </Accordion.Toggle>
                                         <Accordion.Collapse eventKey="1">
-                                            <StatsBanho />
+                                            <StatsBanho perfil={perfil} />
                                         </Accordion.Collapse>
                                     </Accordion>
                                 </Tab>
