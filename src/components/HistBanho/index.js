@@ -7,12 +7,17 @@ import Form from 'react-bootstrap/Form';
 import FormGroup from 'react-bootstrap/FormGroup';
 import Spinner from 'react-bootstrap/Spinner';
 
-import {FaStepBackward, FaBackward, FaStepForward, FaForward, FaClock, FaHome, FaShower, FaCalendarDay, FaSearch} from 'react-icons/fa';
+import ModalConfirmacaoAcao from '../../components/ModalConfirmacaoAcao';
+
+import {FaStepBackward, FaBackward, FaStepForward, FaForward, FaClock, FaHome, FaShower, FaCalendarDay, FaSearch, FaEraser} from 'react-icons/fa';
 import {MdTimer} from 'react-icons/md';
 
+import {AlertMessage} from '../../assets/global/style';
 import {Classificador, TabelaRegistros, PaginaFiltro, FormFiltro, CampoPagina} from './style';
 
 import shower_api from '../../services/shower_api';
+import profile_api from '../../services/profile_api';
+import getError from '../../helpers/handleErrors';
 
 
 export default function HistBanho(props) {
@@ -21,6 +26,8 @@ export default function HistBanho(props) {
     const perfil = props.perfil;
     
     const [isLoading, setIsLoading] = useState(true);
+    const [modalShow, setModalShow] = useState(false);
+    const [error, setError] = useState({status: false});
     
     const [totalPorPagina, setTotalPorPagina] = useState(DEFAULT_PER_PAGE);
     const [data_inicio, setData_inicio] = useState(moment().startOf('month').format('YYYY-MM-DD'));
@@ -69,9 +76,11 @@ export default function HistBanho(props) {
                 setRegistrosBusca(historico);
                 setRegistrosFiltrados(historico.slice(0, DEFAULT_PER_PAGE));
                 setIsLoading(false);
+                setError({status: false});
             })
             .catch(err => {
                 console.error(err);
+                setError({status: true, message: `Erro ao buscar histórico.`, descricao: getError(err)})
             })
     }, [perfil]);
 
@@ -137,13 +146,13 @@ export default function HistBanho(props) {
                 case 2:
                 case 3:
                 case 4:
-                    filtrados = filtrados.filter(f => f.classificacao === cl);
+                    filtrados = filtrados.filter(f => f.classificacao_temperatura === cl);
                     break;
                 case 5:
-                    filtrados = filtrados.filter(f => f.classificacao === 1 || f.classificacao === 2);
+                    filtrados = filtrados.filter(f => f.classificacao_temperatura === 1 || f.classificacao_temperatura === 2);
                     break;
                 case 6:
-                    filtrados = filtrados.filter(f => f.classificacao === 3 || f.classificacao === 4);
+                    filtrados = filtrados.filter(f => f.classificacao_temperatura === 3 || f.classificacao_temperatura === 4);
                     break;
                 default: return;
             }
@@ -213,6 +222,17 @@ export default function HistBanho(props) {
     
     const handleFiltragem = e => {
         e.preventDefault();
+    }
+
+    const excluirHistorico = async () => {
+        await profile_api.delete(`/excluirhistorico/${perfil.id_perfil}`)
+            .then(()=> {
+                window.location.reload();
+            })
+            .catch(err => {
+                console.error(err);
+                setError({status: true, message: `Erro ao excluir histórico.`, descricao: getError(err)});
+            })
     }
 
     return (
@@ -301,8 +321,8 @@ export default function HistBanho(props) {
                                 registrosFiltrados.map((registro, index) => (
                                     <tr key={index}>
                                         <td>{registro.temp_ambiente}</td>
-                                        <td><Classificador classificacao={registro.classificacao}>{registro.temp_utilizada}</Classificador></td>
-                                        <td>{converteParaHoraMinutoSegundo(registro.duracao_seg)}</td>
+                                        <td><Classificador classificacao={registro.classificacao_temperatura}>{registro.temp_utilizada}</Classificador></td>
+                                        <td><Classificador classificacao={registro.classificacao_duracao}>{converteParaHoraMinutoSegundo(registro.duracao_seg)}</Classificador></td>
                                         <td>{registro.dia}</td>
                                         <td>{registro.hora}</td>
                                     </tr>
@@ -310,6 +330,23 @@ export default function HistBanho(props) {
                             }
                         </tbody>
                     </TabelaRegistros>
+                    {registros.length > 0 && <Button variant="danger" className="m-2" onClick={()=> setModalShow(true)}><span><FaEraser />Excluir Histórico</span></Button> }
+                    <ModalConfirmacaoAcao 
+                        show={modalShow} 
+                        onHide={() => setModalShow(false)} 
+                        sucesso={excluirHistorico}
+                        message={<p>Você tem certeza que pretende excluir o seu histórico? Essa ação <strong>não poderá ser desfeita!</strong></p>}
+                    />
+                    {error.status && 
+                        <AlertMessage variant="danger">
+                            <AlertMessage.Heading>
+                                {error.message}
+                            </AlertMessage.Heading>
+                            <div className="text-muted">
+                                {error.descricao}
+                            </div>
+                        </AlertMessage>
+                    }
                 </>
             }
 

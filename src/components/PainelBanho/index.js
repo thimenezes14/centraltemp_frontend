@@ -94,10 +94,16 @@ export default function PainelBanho(props) {
             </AlertMessage>
         }
         <Painel>
-            <ModalConfirmacaoAcao show={modalShow} onHide={() => setModalShow(false)} temperatura_escolhida={temperatura} sucesso={registrar}/>
+            <ModalConfirmacaoAcao 
+                show={modalShow} 
+                onHide={() => setModalShow(false)} 
+                sucesso={registrar}
+                message={<p>Você tem certeza em usar a temperatura de <strong>{temperatura}ºC</strong> para o seu banho?</p>}
+            />
             {loading.status && <AlertMessage variant="info">{loading.message}</AlertMessage>}
             {!loading.status && 
             <>
+                {!error.status && <> 
                 <CardTemperatura color="#9dc6a7">
                     <h6 className="text-dark">RECOMENDADO:</h6>
                     <CardTemperaturaInfo color="#2b580c">
@@ -126,6 +132,7 @@ export default function PainelBanho(props) {
                         disabled={chuveiro.ligado}
                       />
                 </CardTemperatura>
+                </>}
 
             </>
                 

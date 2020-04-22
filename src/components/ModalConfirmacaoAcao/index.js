@@ -17,9 +17,7 @@ export default function ModalConfirmacaoAcao(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>
-            Você tem certeza em usar a temperatura de <strong>{props.temperatura_escolhida}°C</strong> para o seu banho ?
-          </p>
+            {props.message}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={props.onHide}>Não</Button>
