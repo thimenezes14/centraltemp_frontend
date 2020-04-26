@@ -17,18 +17,29 @@ import ModalExclusao from '../../components/ModalExclusao';
 import StatsBanho from '../../components/StatsBanho';
 import HistBanho from '../../components/HistBanho';
 
+import shower_api from '../../services/shower_api';
 import getError from '../../helpers/handleErrors';
 
 function Dashboard(props) {
 
-    const [key, setKey] = useState('informacoes');
+    const [key, setKey] = useState('banho');
     const [perfil, setPerfil] = useState({});
     const [loading, setLoading] = useState({ status: true, mensagem: 'Carregando sessão. Aguarde...' });
     const [erro, setErro] = useState({ status: null, mensagem: null });
 
     const [modalShow, setModalShow] = useState(false);
 
+    function finalizarBanho() {
+        shower_api.post('finalizar')
+            .then(()=> console.info("Histórico atualizado. "))
+            .catch(err => {
+              console.error(getError(err));
+            })
+    }
+
     useEffect(() => {
+        finalizarBanho();
+        
         const carregarPerfil = async () => {
             const perfil = await profile_api.get(`${props.location.state}`);
             return perfil.data;

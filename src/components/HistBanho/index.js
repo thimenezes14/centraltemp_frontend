@@ -6,10 +6,12 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import FormGroup from 'react-bootstrap/FormGroup';
 import Spinner from 'react-bootstrap/Spinner';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 import ModalConfirmacaoAcao from '../../components/ModalConfirmacaoAcao';
 
-import {FaStepBackward, FaBackward, FaStepForward, FaForward, FaClock, FaHome, FaShower, FaCalendarDay, FaSearch, FaEraser} from 'react-icons/fa';
+import {FaStepBackward, FaBackward, FaStepForward, FaForward, FaClock, FaHome, FaShower, FaCalendarDay, FaSearch, FaEraser, FaRedo} from 'react-icons/fa';
 import {MdTimer} from 'react-icons/md';
 
 import {AlertMessage} from '../../assets/global/style';
@@ -18,7 +20,8 @@ import {Classificador, TabelaRegistros, PaginaFiltro, FormFiltro, CampoPagina} f
 import shower_api from '../../services/shower_api';
 import profile_api from '../../services/profile_api';
 import getError from '../../helpers/handleErrors';
-
+import Filtro from '../../helpers/Filtro';
+import converteParaHoraMinutoSegundo from '../../helpers/converterSegundos';
 
 export default function HistBanho(props) {
     const DEFAULT_PER_PAGE = 5;
@@ -33,32 +36,14 @@ export default function HistBanho(props) {
     const [data_inicio, setData_inicio] = useState(moment().startOf('month').format('YYYY-MM-DD'));
     const [data_fim, setData_fim] = useState(moment().endOf('month').format('YYYY-MM-DD'));
     const [classificacao, setClassificacao] = useState(DEFAULT_CLASSIFICATION);
+    const [classificacao_duracao, setClassificacao_duracao] = useState(DEFAULT_CLASSIFICATION);
 
     const [registros, setRegistros] = useState([]);
     const [registrosFiltrados, setRegistrosFiltrados] = useState(registros.slice(0, totalPorPagina));
     const [registrosBusca, setRegistrosBusca] = useState([]);
     const [pagina, setPagina] = useState(1);
     const [paginaFiltro, setPaginaFiltro] = useState(pagina);
-    const [botoes, setBotoes] = useState([]);
-
-    function pad(num) {
-        return ("0" + num).slice(-2);
-    }
-    
-    function converteParaHoraMinutoSegundo(segundos) {
-        let minutos = Math.floor(segundos / 60);
-        segundos = segundos % 60;
-        let horas = Math.floor(minutos / 60);
-        minutos = minutos % 60;
-
-        if(horas === 0) {
-            horas = ''
-        } else {
-            horas += 'h'
-        }
-
-        return `${horas}${pad(minutos)}m${pad(segundos)}s`;
-    }
+    const [totaldePaginas, setTotaldePaginas] = useState(1);
 
     useEffect(()=> {
         const carregarHistorico = async () => {
@@ -74,7 +59,7 @@ export default function HistBanho(props) {
             .then(historico => {
                 setRegistros(historico);
                 setRegistrosBusca(historico);
-                setRegistrosFiltrados(historico.slice(0, DEFAULT_PER_PAGE));
+                setRegistrosFiltrados(historico.slice(0, totalPorPagina));
                 setIsLoading(false);
                 setError({status: false});
             })
@@ -82,102 +67,42 @@ export default function HistBanho(props) {
                 console.error(err);
                 setError({status: true, message: `Erro ao buscar histórico.`, descricao: getError(err)})
             })
-    }, [perfil]);
+    }, [totalPorPagina, perfil]);
 
     useEffect(()=> {
-        const botoes = [];
         const totalPaginas = Math.ceil(registrosBusca.length / totalPorPagina);
-        for(let i = 0; i < totalPaginas; i++) {
-            botoes.push(i + 1);
-        }
-        setBotoes(botoes);
+        setTotaldePaginas(totalPaginas);
     }, [totalPorPagina, registrosBusca]);
 
-    const limparFiltros = () => {
-        setRegistrosBusca(registros);
-        setRegistrosFiltrados(registros.slice(0, totalPorPagina));
-    }
-
-    const filtrar = criterio => {
-        limparFiltros();
-        
-        let filtrados = [];
-
-        function filtrarPorData() {
-            if(!Date.parse(data_inicio)) {
-                setData_inicio(moment().startOf('month').format('YYYY-MM-DD'));
-                return;
-            }
-    
-            if(!Date.parse(data_fim)) {
-                setData_fim(moment().endOf('month').format('YYYY-MM-DD'));
-                return;
-            }
-    
-            let dt_ini = moment(data_inicio, 'YYYY-MM-DD');
-            let dt_fim = moment(data_fim, 'YYYY-MM-DD');
-    
-            if(dt_ini.isAfter(dt_fim)) {
-                dt_ini = moment().startOf('month').format('YYYY-MM-DD');
-                setData_inicio(dt_ini);
-            }
-    
-            if(dt_fim.isBefore(dt_ini)) {
-                dt_fim = moment().endOf('month').format('YYYY-MM-DD');
-                setData_fim(dt_fim);
-            }
-            
-            filtrados = registros.filter(f => {
-                const data_comparacao = moment(f.dia, 'DD/MM/YYYY');
-                return data_comparacao.isBetween(dt_ini, dt_fim, null, '[]');
-            })
-    
-        }
-
-        function filtrarPorClassificacao() {
-            
-            const cl = Number(criterio);
-            setClassificacao(cl);
-
-            switch (cl) {
-                case 0:
-                    break;
-                case 1:                    
-                case 2:
-                case 3:
-                case 4:
-                    filtrados = filtrados.filter(f => f.classificacao_temperatura === cl);
-                    break;
-                case 5:
-                    filtrados = filtrados.filter(f => f.classificacao_temperatura === 1 || f.classificacao_temperatura === 2);
-                    break;
-                case 6:
-                    filtrados = filtrados.filter(f => f.classificacao_temperatura === 3 || f.classificacao_temperatura === 4);
-                    break;
-                default: return;
-            }
-
-            setRegistrosBusca(filtrados);
-            setRegistrosFiltrados(filtrados.slice(0, totalPorPagina));
-        }
-
-        filtrarPorData();
-        filtrarPorClassificacao();
-        
+    const resetPaginaFiltro = () => {
         setPagina(1);
         setPaginaFiltro(1);
+    }
+
+    const filtrar = () => {
+        let filtro = new Filtro(registros);
+        setRegistrosFiltrados(filtro.aplicarFiltros([data_inicio, data_fim], classificacao, classificacao_duracao).slice(0, totalPorPagina));
+        setRegistrosBusca(filtro.aplicarFiltros([data_inicio, data_fim], classificacao, classificacao_duracao));
+        resetPaginaFiltro();
     }
 
     const filtrarPorPagina = limite => {
         setTotalPorPagina(limite);
         setRegistrosFiltrados(registrosBusca.slice(0, limite));
-        setPagina(1);
-        setPaginaFiltro(1);
+        resetPaginaFiltro();
+    }
+
+    const limparFiltros = () => {
+        setClassificacao_duracao(DEFAULT_CLASSIFICATION);
+        setClassificacao(DEFAULT_CLASSIFICATION);
+        setData_inicio(moment().startOf('month').format('YYYY-MM-DD'));
+        setData_fim(moment().endOf('month').format('YYYY-MM-DD'));
+        filtrar();
     }
 
     const mudarDePagina = paginaMudar => {
-        if(paginaMudar > botoes.length) {
-            paginaMudar = botoes.length;
+        if(paginaMudar > totaldePaginas) {
+            paginaMudar = totaldePaginas;
         }
         if(paginaMudar < 1) {
             paginaMudar = 1;
@@ -187,22 +112,9 @@ export default function HistBanho(props) {
         setRegistrosFiltrados(registrosBusca.slice(totalPorPagina * (paginaMudar - 1), totalPorPagina * paginaMudar));
     }
 
-    const handlePagina = e => {
-        if(e.target.value.length !== 0) {
-            if(e.target.value > botoes.length || e.target.value < 1) {
-                return false;
-            }
-            setPagina(e.target.value);
-        }
-
-        setPaginaFiltro(e.target.value);
-        
-    }
-
     const handleMudarPagina = e => {
         e.preventDefault();
         const pg = typeof e.target.value === 'number' ? e.target.value : pagina;
-        setPagina(e.target.value);
         mudarDePagina(pg);
     }
 
@@ -224,6 +136,24 @@ export default function HistBanho(props) {
         e.preventDefault();
     }
 
+    const checkDate = () => {
+        let dt_ini = moment(data_inicio, 'YYYY-MM-DD');
+        let dt_fim = moment(data_fim, 'YYYY-MM-DD');
+
+        if(dt_fim.isBefore(dt_ini)) {
+            setData_inicio(dt_fim.format('YYYY-MM-DD'));
+            setData_fim(dt_ini.format('YYYY-MM-DD'));
+
+            if(dt_ini.diff(dt_fim, 'years', true) > 1) {
+                setData_fim(moment(data_fim).add(1, 'years').format('YYYY-MM-DD'));
+            }
+        } else {
+            if(dt_fim.diff(dt_ini, 'years', true) > 1) {
+                setData_fim(moment(dt_ini).add(1, 'years').format('YYYY-MM-DD'));
+            }
+        }
+    }
+
     const excluirHistorico = async () => {
         await profile_api.delete(`/excluirhistorico/${perfil.id_perfil}`)
             .then(()=> {
@@ -242,7 +172,7 @@ export default function HistBanho(props) {
                 <FormGroup>
                     <Form.Label>Mostrar por Página</Form.Label>
                     <Form.Control as="select" value={totalPorPagina} onChange={e => filtrarPorPagina(e.target.value)}>
-                        <option value={5}>5 registros</option>
+                        <option value={DEFAULT_PER_PAGE}>{DEFAULT_PER_PAGE} registros</option>
                         <option value={10}>10 registros</option>
                         <option value={15}>15 registros</option>
                         <option value={20}>20 registros</option>
@@ -250,27 +180,46 @@ export default function HistBanho(props) {
                 </FormGroup>
                 <Form.Label>Filtrar por Data</Form.Label>
                 <FormGroup>
-                    
-                    <Form.Label>
-                        Início
-                        <Form.Control type="date" value={data_inicio} onChange={e => {setData_inicio(e.target.value); filtrar(classificacao);}} onBlur={()=> filtrar(classificacao)} />
-                        Fim
-                        <Form.Control type="date" value={data_fim} onChange={e => {setData_fim(e.target.value); filtrar(classificacao);}} onBlur={()=> filtrar(classificacao)} />
-                    </Form.Label>
-                    
+                    <Row>
+                        <Col md={6}>
+                            <Form.Label>Início</Form.Label>
+                            <Form.Control type="date" value={data_inicio} onChange={e => {setData_inicio(e.target.value)}} onBlur={checkDate}/>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Label>Fim</Form.Label>
+                            <Form.Control type="date" value={data_fim} onChange={e => {setData_fim(e.target.value)}} onBlur={checkDate} />
+                        </Col>
+                    </Row>
                 </FormGroup>
+                <Form.Label>Filtrar por Classificação</Form.Label>
                 <FormGroup>
-                    <Form.Label>Filtrar por Classificação</Form.Label>
-                    <Form.Control as="select" value={classificacao} onChange={e => filtrar(Number(e.target.value))}>
-                        <option value={0}>Todos</option>
-                        <option value={5}>Adequados (ideal + bom)</option>
-                        <option value={6}>Não adequados (ruim + crítico)</option>
-                        <option value={1}>Ideal</option>
-                        <option value={2}>Bom</option>
-                        <option value={3}>Ruim</option>
-                        <option value={4}>Crítico</option>
-                    </Form.Control>
+                    <Row>
+                        <Col md={6}>
+                            <Form.Label>Temperatura</Form.Label>
+                            <Form.Control as="select" value={classificacao} onChange={e => setClassificacao(Number(e.target.value))}>
+                                <option value={0}>Todos</option>
+                                <option value={5}>Adequados (ideal + bom)</option>
+                                <option value={6}>Não adequados (ruim + crítico)</option>
+                                <option value={1}>Ideal</option>
+                                <option value={2}>Bom</option>
+                                <option value={3}>Ruim</option>
+                                <option value={4}>Crítico</option>
+                            </Form.Control>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Label>Duração</Form.Label>
+                            <Form.Control as="select" value={classificacao_duracao} onChange={e => setClassificacao_duracao(Number(e.target.value))}>
+                                <option value={0}>Todos</option>
+                                <option value={4}>Adequados (ideal + bom)</option>
+                                <option value={1}>Ideal</option>
+                                <option value={2}>Bom</option>
+                                <option value={3}>Ruim</option>
+                            </Form.Control>
+                        </Col>
+                    </Row>
                 </FormGroup>
+                <Button className="p-2 m-2" variant="success" onClick={() => filtrar()}><span><FaSearch/> Aplicar Filtros</span></Button>
+                <Button className="p-2 m-2" variant="info" onClick={() => limparFiltros()}><span><FaRedo/> Limpar Filtros</span></Button>
             </FormFiltro>
             
             <hr />
@@ -282,13 +231,13 @@ export default function HistBanho(props) {
                     
                     <Form onSubmit={handleMudarPagina}>
                         
-                        <CampoPagina className="text-center" type="number" step="1" value={paginaFiltro} onBlur={handleMudarPagina} onChange={handlePagina} />
+                        <CampoPagina className="text-center" type="number" step="1" value={paginaFiltro} onBlur={handleMudarPagina} onChange={e => mudarDePagina(e.target.value)} />
                         <Button variant="dark" type="submit" block><FaSearch /></Button>
                         
                     </Form>
 
                     <Button onClick={()=> handlePrevNext('next')}><FaStepForward /></Button>
-                    <Button variant="info" onClick={()=> mudarDePagina(botoes.length)}><FaForward /></Button>
+                    <Button variant="info" onClick={()=> mudarDePagina(totaldePaginas)}><FaForward /></Button>
                     </>
                 }
             </ButtonGroup>
@@ -304,7 +253,7 @@ export default function HistBanho(props) {
                 <>
                     <hr />
                     <div className="container bg-info">Total: {registros.length} - Filtrados: {registrosBusca.length}</div>
-                    {registrosBusca.length > 0 && <div className="container bg-primary"> Pág. {pagina}-{botoes.length} | {(totalPorPagina * (pagina - 1)) + 1}-{(totalPorPagina * pagina) > registrosBusca.length ? registrosBusca.length : (totalPorPagina * pagina)} de {registrosBusca.length} </div>}
+                    {registrosBusca.length > 0 && <div className="container bg-primary"> Pág. {pagina}-{totaldePaginas} | {(totalPorPagina * (pagina - 1)) + 1}-{(totalPorPagina * pagina) > registrosBusca.length ? registrosBusca.length : (totalPorPagina * pagina)} de {registrosBusca.length} </div>}
                     
                     <TabelaRegistros variant="light" responsive="lg" bordered>
                         <thead>
@@ -330,7 +279,7 @@ export default function HistBanho(props) {
                             }
                         </tbody>
                     </TabelaRegistros>
-                    {registros.length > 0 && <Button variant="danger" className="m-2" onClick={()=> setModalShow(true)}><span><FaEraser />Excluir Histórico</span></Button> }
+                    {registros.length > 0 && <Button variant="danger" className="m-2" onClick={()=> setModalShow(true)}><span><FaEraser /> Excluir Histórico</span></Button> }
                     <ModalConfirmacaoAcao 
                         show={modalShow} 
                         onHide={() => setModalShow(false)} 

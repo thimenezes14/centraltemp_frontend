@@ -11,6 +11,9 @@ export default function StatsBanho(props) {
   const [classificacaoTemperatura, setClassificacaoTemperatura] = useState([0,0,0,0]);
   const [classificacaoDuracao, setClassificacaoDuracao] = useState([0,0,0]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const porcentagem_temperatura = ((classificacaoTemperatura[0] + classificacaoTemperatura[1]) / classificacaoTemperatura.reduce((acc, val) => acc + val) * 100).toFixed(1);
+  const porcentagem_duracao = ((classificacaoDuracao[0] + classificacaoDuracao[1]) / classificacaoDuracao.reduce((acc, val) => acc + val) * 100).toFixed(1);
   
   const config_temperatura = {
     options: {
@@ -183,22 +186,34 @@ export default function StatsBanho(props) {
         {
           !isLoading &&
             <>
-            <AlertMessage variant="info">{((classificacaoTemperatura[0] + classificacaoTemperatura[1]) / classificacaoTemperatura.reduce((acc, val) => acc + val) * 100).toFixed(1) }% dos banhos estão dentro da temperatura adequada!</AlertMessage>
-            <ReactApexChart options={config_temperatura.options} series={classificacaoTemperatura} type="donut" width="400" />
+            {
+              !isNaN(porcentagem_temperatura) && 
+              <><AlertMessage variant="info">{porcentagem_temperatura}% dos banhos estão dentro da temperatura adequada!</AlertMessage>
+              <ReactApexChart options={config_temperatura.options} series={classificacaoTemperatura} type="donut" width="400" /></>
+            }
+            {
+              isNaN(porcentagem_temperatura) &&
+              <p className="text-muted">Nada para mostrar.</p>
+            }
             </>
         }
         {isLoading && <p>Obtendo dados...</p>}
       </Grafico>
-      <Grafico>
-        {
-          !isLoading &&
-            <>
-            <AlertMessage variant="info">{((classificacaoDuracao[0] + classificacaoDuracao[1]) / classificacaoDuracao.reduce((acc, val) => acc + val) * 100).toFixed(1) }% dos banhos estão dentro do tempo adequado!</AlertMessage>
-            <ReactApexChart options={config_duracao.options} series={classificacaoDuracao} type="donut" width="400" />
-            </>
-        }
-        {isLoading && <p>Obtendo dados...</p>}
-      </Grafico>
+      {
+        !isNaN(porcentagem_duracao) &&
+        <Grafico>
+          {
+            !isLoading &&
+              <>
+              <AlertMessage variant="info">{porcentagem_duracao}% dos banhos estão dentro do tempo adequado!</AlertMessage>
+              <ReactApexChart options={config_duracao.options} series={classificacaoDuracao} type="donut" width="400" />
+              </>
+          }
+          {isLoading && <p>Obtendo dados...</p>}
+        </Grafico>  
+
+      }
+      
     </div>
   );
 }
