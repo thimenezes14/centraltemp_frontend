@@ -31,6 +31,8 @@ export default function FormCadastro(props) {
     const [avatarSelecionado, setAvatarSelecionado] = useState('default.png');
     const [avatares, setAvatares] = useState([]);
 
+    const [secMode, setSecMode] = useState(undefined);
+
     const carregarAvatares = async () => {
         const imagens = (await profile_api.get('imagens')).data
         setAvatares(imagens);
@@ -50,8 +52,9 @@ export default function FormCadastro(props) {
             setNome(nome);
             setSexo(sexo);
             setData_nasc(moment(data_nasc, 'DD/MM/YYYY').format('YYYY-MM-DD'));
-            setAvatarSelecionado(avatar)
-            
+            setAvatarSelecionado(avatar);
+            setSecMode(props.perfil.sec_mode);
+
             setNomeOk(true);
             setSexoOk(true);
             setData_nascOk(true);
@@ -173,7 +176,7 @@ export default function FormCadastro(props) {
     const enableButton = () => {
         
         if(props.action === 'update') {
-            if(props.perfil.nome === nome && props.perfil.avatar === avatarSelecionado) {
+            if(props.perfil.nome === nome && props.perfil.avatar === avatarSelecionado && props.perfil.sec_mode === secMode) {
                 const TAM_SENHA = 4;
                 if(senha.length === TAM_SENHA && senhaConfOk) {
                     setButtonDisabled(false);
@@ -219,6 +222,10 @@ export default function FormCadastro(props) {
 
                 if(avatarSelecionado)
                     dadosParaAtualizar.avatar = avatarSelecionado;
+
+                if(secMode !== props.perfil.sec_mode) {
+                    dadosParaAtualizar.sec_mode = secMode;
+                }
 
                 await profile_api.put(`/atualizar/${props.perfil.id_perfil}`, dadosParaAtualizar);
                 window.location.reload();
@@ -297,6 +304,25 @@ export default function FormCadastro(props) {
                         ))}
                     </GrupoOpcoesImagem>
                 </FormularioCadastro.Group>
+
+                {
+                    props.action === 'update' && 
+                
+                    <FormularioCadastro.Group className="bg-warning">
+                        <FormularioCadastro.Label>Modo Seguro</FormularioCadastro.Label>
+                        <FormularioCadastro.Check type="checkbox" checked={secMode ? true : false} value={secMode} onChange={() => setSecMode(!secMode)}/>
+                        {
+                                !secMode && 
+                                <div className="p-2 m-2 bg-danger text-white">
+                                    <h5>ATENÇÃO: MODO SEGURO DESMARCADO</h5>
+                                    O modo seguro garante que a escolha da sua temperatura seja sempre adequada para você. 
+                                    Desmarcar esta opção fará com que o sistema não limite as temperaturas seguras. Faça isso somente se você
+                                    tem certeza sobre tal ação.
+                                </div>
+                            
+                        }
+                    </FormularioCadastro.Group>
+                }
 
                 <BotaoFormularioCadastro type="submit" variant="success" disabled={buttonDisabled}><FaCheckCircle /> SALVAR</BotaoFormularioCadastro>
                 <Alert variant="danger" show={error.status}>{error.message}</Alert>

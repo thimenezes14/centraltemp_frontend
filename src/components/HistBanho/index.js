@@ -33,8 +33,8 @@ export default function HistBanho(props) {
     const [error, setError] = useState({status: false});
     
     const [totalPorPagina, setTotalPorPagina] = useState(DEFAULT_PER_PAGE);
-    const [data_inicio, setData_inicio] = useState(moment().startOf('month').format('YYYY-MM-DD'));
-    const [data_fim, setData_fim] = useState(moment().endOf('month').format('YYYY-MM-DD'));
+    const [data_inicio, setData_inicio] = useState('');
+    const [data_fim, setData_fim] = useState('');
     const [classificacao, setClassificacao] = useState(DEFAULT_CLASSIFICATION);
     const [classificacao_duracao, setClassificacao_duracao] = useState(DEFAULT_CLASSIFICATION);
 
@@ -80,6 +80,7 @@ export default function HistBanho(props) {
     }
 
     const filtrar = () => {
+        checkDate();
         let filtro = new Filtro(registros);
         setRegistrosFiltrados(filtro.aplicarFiltros([data_inicio, data_fim], classificacao, classificacao_duracao).slice(0, totalPorPagina));
         setRegistrosBusca(filtro.aplicarFiltros([data_inicio, data_fim], classificacao, classificacao_duracao));
@@ -95,8 +96,8 @@ export default function HistBanho(props) {
     const limparFiltros = () => {
         setClassificacao_duracao(DEFAULT_CLASSIFICATION);
         setClassificacao(DEFAULT_CLASSIFICATION);
-        setData_inicio(moment().startOf('month').format('YYYY-MM-DD'));
-        setData_fim(moment().endOf('month').format('YYYY-MM-DD'));
+        setData_inicio('');
+        setData_fim('');
         filtrar();
     }
 
@@ -137,6 +138,19 @@ export default function HistBanho(props) {
     }
 
     const checkDate = () => {
+
+        if(!Date.parse(data_inicio) && !Date.parse(data_fim)) {
+            return;
+        }
+
+        if(!Date.parse(data_inicio)) {
+            setData_inicio(moment(data_fim, 'YYYY-MM-DD').startOf('month').format('YYYY-MM-DD'));
+        }
+
+        if(!Date.parse(data_fim)) {
+            setData_fim(moment(data_inicio, 'YYYY-MM-DD').endOf('month').format('YYYY-MM-DD'));
+        }
+        
         let dt_ini = moment(data_inicio, 'YYYY-MM-DD');
         let dt_fim = moment(data_fim, 'YYYY-MM-DD');
 
@@ -186,7 +200,7 @@ export default function HistBanho(props) {
                             <Form.Control type="date" value={data_inicio} onChange={e => {setData_inicio(e.target.value)}} onBlur={checkDate}/>
                         </Col>
                         <Col md={6}>
-                            <Form.Label>Fim</Form.Label>
+                            <Form.Label>Fim (máx. 1 ano)</Form.Label>
                             <Form.Control type="date" value={data_fim} onChange={e => {setData_fim(e.target.value)}} onBlur={checkDate} />
                         </Col>
                     </Row>
@@ -284,7 +298,12 @@ export default function HistBanho(props) {
                         show={modalShow} 
                         onHide={() => setModalShow(false)} 
                         sucesso={excluirHistorico}
-                        message={<p>Você tem certeza que pretende excluir o seu histórico? Essa ação <strong>não poderá ser desfeita!</strong></p>}
+                        message={
+                                    <>
+                                        <p>Você tem certeza que pretende excluir o seu histórico? Essa ação <strong>não poderá ser desfeita!</strong></p>
+                                        <h5>Excluir seu histórico poderá redefinir suas preferências!</h5>
+                                    </>
+                                }
                     />
                     {error.status && 
                         <AlertMessage variant="danger">
