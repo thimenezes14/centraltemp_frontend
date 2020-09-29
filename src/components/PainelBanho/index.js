@@ -29,6 +29,7 @@ export default function PainelBanho(props) {
             setLoading({status: true, message: 'Carregando recomendações...'});
             const recomendacao = (await shower_api.get('/recomendartemperatura')).data;
             setRecomendacao(recomendacao);
+            console.log(recomendacao)
             setTemperatura(recomendacao.temperatura_recomendada);
             setError({status: false});
             setAlertError(false);
