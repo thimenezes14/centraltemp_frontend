@@ -46,7 +46,8 @@ function Chuveiro(props) {
     carregarDadosDoChuveiro()
       .then(chuveiro => {
         setChuveiroEstado({ status: chuveiro.ligado, temperatura: chuveiro.temperatura })
-        setTempRange(chuveiro.ligado ? chuveiro.temperatura : tempRange)
+        const temperatura = chuveiro.ligado ? chuveiro.temperatura : tempRange
+        setTempRange(temperatura)
       })
       .catch(err => setErro({ status: true, mensagem: `Erro ao comunicar-se com o servidor do chuveiro.`, descricao: getError(err) }))
       .finally(() => setLoading({ status: false }))
