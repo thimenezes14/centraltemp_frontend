@@ -21,7 +21,6 @@ import shower_api from '../../services/shower_api';
 import profile_api from '../../services/profile_api';
 import getError from '../../helpers/handleErrors';
 import Filtro from '../../helpers/Filtro';
-import converteParaHoraMinutoSegundo from '../../helpers/converterSegundos';
 
 export default function HistBanho(props) {
     const DEFAULT_PER_PAGE = 5;
@@ -285,7 +284,7 @@ export default function HistBanho(props) {
                                     <tr key={index}>
                                         <td>{registro.temp_ambiente}</td>
                                         <td><Classificador classificacao={registro.classificacao_temperatura}>{registro.temp_utilizada}</Classificador></td>
-                                        <td><Classificador classificacao={registro.classificacao_duracao}>{converteParaHoraMinutoSegundo(registro.duracao_seg)}</Classificador></td>
+                                        <td><Classificador classificacao={registro.classificacao_duracao}>{registro.duracao_seg}</Classificador></td>
                                         <td>{registro.dia}</td>
                                         <td>{registro.hora}</td>
                                     </tr>
